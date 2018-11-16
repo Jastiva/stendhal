@@ -33,7 +33,6 @@ import games.stendhal.common.ItemTools;
 import games.stendhal.common.NotificationType;
 import games.stendhal.common.constants.Nature;
 import games.stendhal.common.constants.SoundLayer;
-import games.stendhal.common.constants.Testing;
 import games.stendhal.common.grammar.Grammar;
 import marauroa.common.game.RPObject;
 import marauroa.common.game.RPObject.ID;
@@ -859,6 +858,17 @@ public abstract class RPEntity extends AudibleEntity {
 	 * @param text message contents
 	 */
 	public void onPrivateListen(final String texttype, final String text) {
+		onPrivateListen(texttype, text, false);
+	}
+
+	/**
+	 * Called when entity listen to text from talker.
+	 *
+	 * @param texttype type of talk (normal private talk, administrator message)
+	 * @param text message contents
+	 * @param headless If <code>true</code>, does not draw on canvas.
+	 */
+	public void onPrivateListen(final String texttype, final String text, final boolean headless) {
 		NotificationType type;
 		try {
 			type = NotificationType.valueOf(texttype);
@@ -871,7 +881,7 @@ public abstract class RPEntity extends AudibleEntity {
 		ClientSingletonRepository.getUserInterface().addEventLine(new HeaderLessEventLine(text, type));
 
 		// Scene settings messages should not disturb playing, just create some atmosphere
-		if (type != NotificationType.SCENE_SETTING) {
+		if (!headless && type != NotificationType.SCENE_SETTING) {
 			ClientSingletonRepository.getUserInterface().addGameScreenText(
 					getX() + (getWidth() / 2.0), getY(),
 					text.replace("|", ""), type, false);
@@ -1322,14 +1332,11 @@ public abstract class RPEntity extends AudibleEntity {
 			def = changes.getInt("modified_def");
 		}
 
-		/* TODO: Remove condition when ranged stat testing is finished. */
-		if (Testing.COMBAT) {
-			if (changes.has("ratk")) {
-				ratk = changes.getInt("ratk");
-			}
-			if (changes.has("modified_ratk")) {
-				ratk = changes.getInt("modified_ratk");
-			}
+		if (changes.has("ratk")) {
+			ratk = changes.getInt("ratk");
+		}
+		if (changes.has("modified_ratk")) {
+			ratk = changes.getInt("modified_ratk");
 		}
 
 		if (changes.has("level")) {
@@ -1347,11 +1354,8 @@ public abstract class RPEntity extends AudibleEntity {
 			defXP = changes.getInt("def_xp");
 		}
 
-		/* TODO: Remove condition when ranged stat testing is finished. */
-		if (Testing.COMBAT) {
-			if (changes.has("ratk_xp")) {
-				ratkXP = changes.getInt("ratk_xp");
-			}
+		if (changes.has("ratk_xp")) {
+			ratkXP = changes.getInt("ratk_xp");
 		}
 
 		if (changes.has("atk_item")) {
@@ -1362,11 +1366,8 @@ public abstract class RPEntity extends AudibleEntity {
 			defItem = changes.getInt("def_item");
 		}
 
-		/* TODO: Remove condition when ranged stat testing is finished. */
-		if (Testing.COMBAT) {
-			if (changes.has("ratk_item")) {
-				ratkItem = changes.getInt("ratk_item");
-			}
+		if (changes.has("ratk_item")) {
+			ratkItem = changes.getInt("ratk_item");
 		}
 
 		if (changes.has("mana")) {

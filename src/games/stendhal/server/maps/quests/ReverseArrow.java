@@ -280,8 +280,8 @@ public class ReverseArrow extends AbstractQuest implements
 		}
 
 		@Override
-		public void onUsedBackwards(final RPEntity user) {
-			super.onUsedBackwards(user);
+		public void onUsedBackwards(final RPEntity user, final boolean hadPath) {
+			super.onUsedBackwards(user, hadPath);
 
 			if (user instanceof Player) {
 				finish(true, (Player) user);
@@ -357,7 +357,7 @@ public class ReverseArrow extends AbstractQuest implements
 	private void step1CreateNPC() {
 		npc = new GamblosSpeakerNPC("Gamblos");
 
-		npc.setEntityClass("noimagenpc"); /* oldwizardnpc */
+		npc.setEntityClass("oldwizardnpc");
 		npc.setPosition(13, 7);
 		npc.setDirection(Direction.DOWN);
 		npc.initHP(100);

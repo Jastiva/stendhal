@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <items xmlns="stendhal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="stendhal ../items.xsd ">
-  
-  <!-- Start Anti-poison -->
-  
+
+  <!-- START: Status Protection -->
+
   <item name="medicinal ring">
     <type class="ring" subclass="medicinal_ring" tileid="-1"/>
-    <description>You see a medicinal ring. It may protect you from being poisoned.</description>
+    <description>You see a medicinal ring. It may protect you from being poisoned when worn on the finger.</description>
     <implementation class-name="games.stendhal.server.entity.item.StatusResistantItem"/>
     <attributes>
     </attributes>
@@ -22,11 +22,11 @@
       <slot name="keyring"/>
     </equipable>
   </item>
-  
+
   <!-- DISABLED
   <item name="antivenom ring">
     <type class="ring" subclass="antivenom_ring" tileid="-1"/>
-    <description>You see an antivenom ring. It has a good chance to protect you from poisoning.</description>
+    <description>You see an antivenom ring. It has a good chance to protect you from poisoning when worn on the finger.</description>
     <implementation class-name="games.stendhal.server.entity.item.StatusResistantItem"/>
     <attributes>
     </attributes>
@@ -42,10 +42,10 @@
       <slot name="keyring"/>
     </equipable>
   </item>
-  
+
   <item name="antitoxin ring">
     <type class="ring" subclass="antitoxin_ring" tileid="-1"/>
-    <description>You see an antitoxin ring. It is highly resistant to poison.</description>
+    <description>You see an antitoxin ring. It is highly resistant to poison when worn on the finger.</description>
     <implementation class-name="games.stendhal.server.entity.item.StatusResistantItem"/>
     <attributes>
     </attributes>
@@ -62,9 +62,28 @@
     </equipable>
   </item>
   DISABLED -->
-  
-  <!-- End Anti-poison -->
-  
+
+  <item name="insulated ring">
+    <type class="ring" subclass="insulated_ring" tileid="-1"/>
+    <description>You see an insulated ring that may protect from being shocked. It must be worn on the finger.</description>
+    <implementation class-name="games.stendhal.server.entity.item.StatusResistantItem"/>
+    <attributes>
+    </attributes>
+    <weight value="0.1"/>
+    <value value="1"/>
+    <resistance type="shocked" value="0.66" slots="finger;"/>
+    <equipable>
+      <slot name="ground"/>
+      <slot name="content"/>
+      <slot name="bag"/>
+      <slot name="trade"/>
+      <slot name="finger"/>
+      <slot name="keyring"/>
+    </equipable>
+  </item>
+
+  <!-- END: Status Protection -->
+
   <item name="wedding ring">
     <type class="ring" subclass="wedding" tileid="-1"/>
     <description>You see a golden wedding ring, a symbol of love.</description>
@@ -120,5 +139,5 @@
       <slot name="keyring"/>
     </equipable>
   </item>
-  
+
 </items>

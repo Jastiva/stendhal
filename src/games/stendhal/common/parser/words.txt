@@ -198,7 +198,7 @@ release	VER
 remember	VER
 remind	VER
 remove	VER
-rent	VER
+rent	VER =hire
 report	VER
 resell	VER
 reserve	VER
@@ -822,7 +822,7 @@ sun	OBJ	suns
 suntan	OBJ	suntans
 supply	OBJ	supplies
 surgeonfish	OBJ-FOO-ANI	surgeonfishes
-suzette	OBJ-FOO	
+suzette	OBJ-FOO
 swamp	OBJ	swamps
 sweatshirt	OBJ	sweatshirts
 swimsuit	OBJ	swimsuits
@@ -1501,7 +1501,7 @@ big	ADJ
 biggest	ADJ
 biting	ADJ
 black	ADJ-COL
-blank	ADJ
+blank	ADJ =empty
 bloody	ADJ
 blue	ADJ-COL
 broken	ADJ

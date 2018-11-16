@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License as        *
- *   published by the Free Software Foundation; either version 3 of the    * 
+ *   published by the Free Software Foundation; either version 3 of the    *
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
@@ -22,13 +22,13 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 	minimapShow: true,
 	minimapStyle: "rgb(255, 255, 255)",
 	dir: 3,
-	
+
 	set: function(key, value) {
 		marauroa.rpobjectFactory["rpentity"].set.apply(this, arguments);
 		if (key === "ghostmode") {
 			this.minimapShow = false;
 		}
-		
+
 		// stats
 		if (marauroa.me !== this) {
 			return;
@@ -48,8 +48,8 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 	buildActions: function(list) {
 		marauroa.rpobjectFactory["rpentity"].buildActions.apply(this, arguments);
 		var playerName = this["_name"];
-		var hasBuddy = playerName in marauroa.me["buddies"];
-		if (!hasBuddy) {
+		var isUnknown = (marauroa.me !== this) && ((marauroa.me["buddies"] == null) || !(playerName in marauroa.me["buddies"]));
+		if (isUnknown) {
 			list.push({
 				title: "Add to buddies",
 				action: function(entity) {
@@ -75,7 +75,7 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 					marauroa.clientFramework.sendAction(action);
 				}
 			});
-		} else if (!hasBuddy) {
+		} else if (isUnknown) {
 			list.push({
 				title: "Ignore",
 				action: function(entity) {
@@ -87,7 +87,14 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 					marauroa.clientFramework.sendAction(action);
 				}
 			});
-		
+		}
+		if (marauroa.me === this) {
+			list.push({
+				title: "Set outfit",
+				action: function(entity) {
+					new stendhal.ui.OutfitDialog();
+				}
+			});
 		}
 	/*
 
@@ -98,7 +105,7 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 		list.add(ActionType.INVITE.getRepresentation());
 		*/
 	},
-	
+
 	isIgnored: function() {
 		if (!marauroa.me["!ignore"]) {
 			return false;
@@ -121,23 +128,22 @@ marauroa.rpobjectFactory["player"] = marauroa.util.fromProto(marauroa.rpobjectFa
 		return this["resistance"];
 	},
 
-	/** 
+	/**
 	 * says a text
 	 */
 	say: function (text) {
 		if (this.isIgnored()) {
 			return;
 		}
-		marauroa.rpobjectFactory["rpentity"].say.apply(this, arguments);		
+		marauroa.rpobjectFactory["rpentity"].say.apply(this, arguments);
 	},
 
-	/** 
+	/**
 	 * Can the player hear this chat message?
 	 */
 	isInHearingRange: function(entity) {
-		return (this.isAdmin() 
-			|| ((Math.abs(this["x"] - entity["x"]) < 15) 
+		return (this.isAdmin()
+			|| ((Math.abs(this["x"] - entity["x"]) < 15)
 				&& (Math.abs(this["y"] - entity["y"]) < 15)));
 	}
 });
-

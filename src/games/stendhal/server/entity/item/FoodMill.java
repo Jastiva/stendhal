@@ -12,7 +12,11 @@
  ***************************************************************************/
 package games.stendhal.server.entity.item;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import games.stendhal.common.grammar.Grammar;
 import games.stendhal.server.core.engine.SingletonRepository;
@@ -21,12 +25,19 @@ import marauroa.common.game.RPObject;
 
 public class FoodMill extends Item {
 
+	/** the logger instance. */
+	private static final Logger logger = Logger.getLogger(RPEntity.class);
+
 	/** The item to be processed */
 	private String input;
 	/** The required container for processing */
 	private String container;
 	/** The resulting processed item */
 	private String output;
+	/** Items that do not require a "container". */
+	private final List<String> containerNotRequired = new ArrayList<String>() {{
+		add("scroll eraser");
+	}};
 
     public FoodMill(final String name, final String clazz,
             final String subclass, final Map<String, String> attributes) {
@@ -47,7 +58,6 @@ public class FoodMill extends Item {
     		output = "sugar";
     	} else if ("scroll eraser".equals(getName())) {
     		input = "marked scroll";
-    		container = "money";
     		output = "empty scroll";
     	} else {
     		input = "apple";
@@ -58,9 +68,18 @@ public class FoodMill extends Item {
 
     @Override
 	public boolean onUsed(final RPEntity user) {
+    	final String tool = getName();
+    	final boolean containerRequired = !containerNotRequired.contains(tool);
+
+    	/* Items/Tools not listed in "containerNotRequired" must have a "container" defined. */
+    	if (containerRequired && container == null) {
+    		logger.error("Input \"" + input + "\" requires a container, but container value is null.");
+    		return false;
+    	}
+
     	/* is the mill equipped at all? */
     	if (!isContained()) {
-    		user.sendPrivateText("You should be carrying the " + getName() + " in order to use it.");
+    		user.sendPrivateText("You should be carrying the " + tool + " in order to use it.");
     		return false;
     	}
 
@@ -68,11 +87,11 @@ public class FoodMill extends Item {
 
     	/* is it in a hand? */
     	if (!slotName.endsWith("hand")) {
-    		user.sendPrivateText("You should hold the " + getName() + " in either hand in order to use it.");
+    		user.sendPrivateText("You should hold the " + tool + " in either hand in order to use it.");
     		return false;
     	}
 
-    	String otherhand = getOtherHand(slotName);
+    	final String otherhand = getOtherHand(slotName);
 
     	final RPObject first = user.getSlot(otherhand).getFirst();
 
@@ -91,7 +110,7 @@ public class FoodMill extends Item {
     		return false;
     	}
 
-    	if (!user.isEquipped(container)) {
+    	if (containerRequired && !user.isEquipped(container)) {
     		user.sendPrivateText("You don't have " + Grammar.a_noun(container) + " with you");
     		return false;
     	}
@@ -105,7 +124,11 @@ public class FoodMill extends Item {
 		} else {
 			user.drop((Item) first);
 		}
-    	user.drop(container);
+
+    	if (containerRequired) {
+    		user.drop(container);
+    	}
+
     	user.equipOrPutOnGround(item);
 
     	return true;

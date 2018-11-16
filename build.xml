@@ -158,7 +158,7 @@
 
 	<target name = "postman">
 		<mkdir dir="${buildroot}/buildbot"/>
-		<javac srcdir="${src}" destdir="${buildroot}/buildbot" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${buildroot}/buildbot" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/bot/postman/*.java"/>
 			<include name="games/stendhal/bot/package-info.java"/>
 			<include name="games/stendhal/bot/shouter/*.java"/>
@@ -203,7 +203,7 @@
 			</fileset>
 		</copy>
 
-		<javac srcdir="${src}" destdir="${build_server}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_server}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/common/*.java"/>
 			<include name="games/stendhal/common/**/*.java"/>
 
@@ -241,7 +241,7 @@
 
 		<mkdir dir="${build_server_maps}"/>
 
-		<javac srcdir="${src}" destdir="${build_server_maps}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_server_maps}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/server/maps/*.java"/>
 			<exclude name="games/stendhal/server/maps/ZoneConfigurator.java"/>
 			<include name="games/stendhal/server/maps/**/*.java"/>
@@ -290,7 +290,7 @@
 
 		<mkdir dir="${build_server_script}"/>
 
-		<javac srcdir="${src}" destdir="${build_server_script}" debug="${javac.debug}" debuglevel="${javac.debuglevel}"  source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_server_script}" debug="${javac.debug}" debuglevel="${javac.debuglevel}"  source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/server/script/*.java"/>
 
 			<compilerarg value="-encoding"/>
@@ -400,7 +400,7 @@
 			public static String getBuildNumber() {return BUILD_NUMBER;}
 			}
 		</echo>
-		<javac srcdir="${src}" destdir="${build_client}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_client}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/client/*.java"/>
 			<include name="games/stendhal/client/**/*.java"/>
 			<exclude name="games/stendhal/client/update/Starter.java"/>
@@ -423,9 +423,9 @@
 		</javac>
 		<delete file="${src}/games/stendhal/client/StendhalBuild.java" quiet="true" failonerror="false" />
 
-		<!-- compile Starter.java for Java 1.2. So we will be able to
+		<!-- compile Starter.java for Java 1.4. So we will be able to
 		 display a dialogbox if running on an old Java Version -->
-		<javac srcdir="${src}" destdir="${build_client}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.2" target="1.2" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_client}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.4" target="1.4" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/client/update/Starter.java"/>
 
 			<compilerarg value="-encoding"/>
@@ -647,6 +647,7 @@
 		<zip destfile="${buildroot}/stendhal-${version}.zip">
 			<zipfileset dir="${buildroot}/stendhal-${version}" excludes="stendhal-starter.jar"/>
 			<zipfileset dir="${buildroot}/stendhal-${version}" includes="stendhal-starter.jar" filemode="755"/>
+			<zipfileset dir="buildtools/launch4j" includes="stendhal-starter.exe" filemode="755"/>
 		</zip>
 		<delete dir="${buildroot}/stendhal-${version}"/>
 	</target>
@@ -731,7 +732,7 @@
 	<target name="compile_stendhaltools" description="compiles the Stendhal build tools">
 		<mkdir dir="${build_stendhaltools}"/>
 
-		<javac srcdir="${src}" destdir="${build_stendhaltools}" source="1.7" target="1.7" debug="${javac.debug}" debuglevel="${javac.debuglevel}" deprecation="${javac.deprecation}" includeantruntime="true">
+		<javac srcdir="${src}" destdir="${build_stendhaltools}" source="1.8" target="1.8" debug="${javac.debug}" debuglevel="${javac.debuglevel}" deprecation="${javac.deprecation}" includeantruntime="true">
 			<include name="games/stendhal/tools/**/*.java"/>
 			<include name="games/stendhal/tools/*.java"/>
 			<compilerarg value="-encoding"/>
@@ -753,7 +754,7 @@
 	<target name="compile_stendhaltextclient" description="compiles the Stendhal text client ">
 		<mkdir dir="${build_stendhaltextclient}"/>
 
-		<javac srcdir="${src}" destdir="${build_stendhaltextclient}" source="1.7" target="1.7" debug="${javac.debug}" debuglevel="${javac.debuglevel}" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="${src}" destdir="${build_stendhaltextclient}" source="1.8" target="1.8" debug="${javac.debug}" debuglevel="${javac.debuglevel}" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="games/stendhal/bot/textclient/*.java"/>
 			<compilerarg value="-encoding"/>
 			<compilerarg value="utf-8"/>
@@ -932,7 +933,7 @@
 			</fileset>
 		</copy>
 
-		<javac srcdir="tests" destdir="${build_tests}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.7" target="1.7" deprecation="${javac.deprecation}" includeantruntime="false">
+		<javac srcdir="tests" destdir="${build_tests}" debug="${javac.debug}" debuglevel="${javac.debuglevel}" source="1.8" target="1.8" deprecation="${javac.deprecation}" includeantruntime="false">
 			<include name="**/*.java"/>
 
 			<compilerarg value="-encoding"/>
@@ -1123,7 +1124,7 @@ d = 9017093486007323270605414717455737376618092805104733236083857811315606869372
 	<extension-point name="js-prepare" depends="js-prepare-marauroa, js-prepare-build" />
 
 	<target name="js-invoke-compiler">
-		<property name="js-debug"          value="" />
+		<property name="js-debug"          value="--debug --formatting=PRETTY_PRINT --create_source_map srcjs/stendhal-compiled.js.map --source_map_include_content" />
 
 		<property name="js-files-license"  value="srcjs/stendhal/license.js" />
 		<property name="js-files-marauroa" value="build/js/marauroa.js build/js/client-framework.js build/js/message-factory.js build/js/perception.js build/js/rpfactory.js build/js/deserializer.js" />
@@ -1133,15 +1134,15 @@ d = 9017093486007323270605414717455737376618092805104733236083857811315606869372
 		<property name="js-files-data2"    value="" />
 		<property name="js-files-entity1"  value="srcjs/stendhal/entity/entity.js srcjs/stendhal/entity/unknown.js srcjs/stendhal/entity/blood.js srcjs/stendhal/entity/corpse.js" />
 		<property name="js-files-entity2"  value="srcjs/stendhal/entity/chest.js srcjs/stendhal/entity/food.js srcjs/stendhal/entity/gate.js srcjs/stendhal/entity/invisibleentity.js srcjs/stendhal/entity/item.js srcjs/stendhal/entity/portal.js" />
-		<property name="js-files-entity3"  value="srcjs/stendhal/entity/activeentity.js srcjs/stendhal/entity/rpentity.js srcjs/stendhal/entity/player.js srcjs/stendhal/entity/creature.js" />
-		<property name="js-files-entity4"  value="srcjs/stendhal/entity/domesticanimal.js srcjs/stendhal/entity/npc.js srcjs/stendhal/entity/sign.js srcjs/stendhal/entity/growingspawner.js srcjs/stendhal/entity/walkblocker.js" />
-		<property name="js-files-entity5"  value="srcjs/stendhal/entity/zone.js srcjs/stendhal/entity/ground.js" /> 
+		<property name="js-files-entity3"  value="srcjs/stendhal/entity/activeentity.js srcjs/stendhal/entity/gameboard.js srcjs/stendhal/entity/rpentity.js srcjs/stendhal/entity/player.js srcjs/stendhal/entity/creature.js" />
+		<property name="js-files-entity4"  value="srcjs/stendhal/entity/domesticanimal.js srcjs/stendhal/entity/npc.js srcjs/stendhal/entity/sign.js srcjs/stendhal/entity/growingspawner.js" />
+		<property name="js-files-entity5"  value="srcjs/stendhal/entity/useableentity.js srcjs/stendhal/entity/walkblocker.js srcjs/stendhal/entity/zone.js srcjs/stendhal/entity/ground.js" /> 
 		<property name="js-files-entity6"  value="" /> 
 		<property name="js-files-ui1"      value="srcjs/stendhal/ui/setdragimage-ie.js srcjs/stendhal/ui/buddylist.js srcjs/stendhal/ui/chatlog.js srcjs/stendhal/ui/gamewindow.js" />
 		<property name="js-files-ui2"      value="srcjs/stendhal/ui/html.js srcjs/stendhal/ui/minimap.js srcjs/stendhal/ui/sound.js srcjs/stendhal/ui/stats.js srcjs/stendhal/ui/chatinput.js" />
 		<property name="js-files-ui3"      value="" />
 		<property name="js-files-main1"    value="srcjs/stendhal/actions.js srcjs/stendhal/events.js" />
-		<property name="js-files-ui4"      value="srcjs/stendhal/ui/popup.js srcjs/stendhal/ui/itemcontainer.js" />
+		<property name="js-files-ui4"      value="srcjs/stendhal/ui/popup.js srcjs/stendhal/ui/itemcontainer.js srcjs/stendhal/ui/menu.js srcjs/stendhal/ui/outfitdialog.js" />
 		<property name="js-files-main2"    value="srcjs/stendhal/main.js" />
 		<property name="js-files-main3"    value="" />
 
@@ -1150,10 +1151,11 @@ d = 9017093486007323270605414717455737376618092805104733236083857811315606869372
 				fork="true"
 				failonerror="true"
 				maxmemory="128m">
-			<arg value="--language_in=ECMASCRIPT5_STRICT"/>
+			<arg value="--language_in=ECMASCRIPT_2015"/>
 			<arg value="--compilation_level" />
 			<arg value="ADVANCED" />
 			<arg line="${js-debug}" />			
+			<arg value="--jscomp_off=checkVars" />
 			
 			<arg value="--js_output_file=srcjs/stendhal-compiled.js"/>
 
@@ -1177,6 +1179,10 @@ d = 9017093486007323270605414717455737376618092805104733236083857811315606869372
 			<arg line="${js-files-main2}" />
 			<arg line="${js-files-main3}" />
 		</java>
+
+		<echo file="srcjs/stendhal-compiled.js" append="true">
+//# sourceMappingURL=stendhal-compiled.js.map
+		</echo>
 	</target>
 	
 </project>

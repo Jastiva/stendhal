@@ -30,6 +30,7 @@ import games.stendhal.server.entity.mapstuff.ExpirationTracker;
 import games.stendhal.server.entity.mapstuff.Fire;
 import games.stendhal.server.entity.mapstuff.WeatherEntity;
 import games.stendhal.server.entity.mapstuff.area.AreaEntity;
+import games.stendhal.server.entity.mapstuff.area.FlyOverArea;
 import games.stendhal.server.entity.mapstuff.area.WalkBlocker;
 import games.stendhal.server.entity.mapstuff.area.Wall;
 import games.stendhal.server.entity.mapstuff.block.Block;
@@ -65,6 +66,7 @@ import games.stendhal.server.events.ExamineEvent;
 import games.stendhal.server.events.GlobalVisualEffectEvent;
 import games.stendhal.server.events.GroupChangeEvent;
 import games.stendhal.server.events.GroupInviteEvent;
+import games.stendhal.server.events.HeadlessPrivateTextEvent;
 import games.stendhal.server.events.HealedEvent;
 import games.stendhal.server.events.ImageEffectEvent;
 import games.stendhal.server.events.PlayerLoggedOnEvent;
@@ -172,8 +174,11 @@ public class RPClassGenerator {
 		if (!RPClass.hasRPClass("spell")) {
 			Spell.generateRPClass();
 		}
-		if (!RPClass.hasRPClass("wallblocker")) {
+		if (!RPClass.hasRPClass("walkblocker")) {
 			WalkBlocker.generateRPClass();
+		}
+		if (!RPClass.hasRPClass("flyover")) {
+			FlyOverArea.generateRPClass();
 		}
 		if (!RPClass.hasRPClass("house_portal")) {
 			HousePortal.generateRPClass();
@@ -268,6 +273,9 @@ public class RPClassGenerator {
 		}
 		if (!RPClass.hasRPClass(Events.PRIVATE_TEXT)) {
 			PrivateTextEvent.generateRPClass();
+		}
+		if (!RPClass.hasRPClass(Events.HEADLESS_PRIVATE_TEXT)) {
+			HeadlessPrivateTextEvent.generateRPClass();
 		}
 		if (!RPClass.hasRPClass(Events.PROGRESS_STATUS_CHANGE)) {
 			ProgressStatusEvent.generateRPClass();

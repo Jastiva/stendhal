@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import games.stendhal.server.core.engine.SingletonRepository;
 import games.stendhal.server.core.events.TurnListener;
 import games.stendhal.server.entity.RPEntity;
+import games.stendhal.server.entity.npc.ChatAction;
 import games.stendhal.server.entity.player.Player;
 import marauroa.common.game.RPObject;
 
@@ -47,6 +48,12 @@ abstract class AccessCheckingPortal extends Portal {
 
     /** Optional password to use portal. */
     protected String requiredPassword;
+
+    /** Optional action to take when access is rejected. */
+    protected ChatAction rejectedAction;
+
+    /** Override continuous movement setting. */
+    protected boolean forceStop = false;
 
     /**
      * Creates an access checking portal with default values.
@@ -247,12 +254,25 @@ abstract class AccessCheckingPortal extends Portal {
 	protected void rejected(final RPEntity user) {
 		if (rejectedMessage != null) {
 			sendMessage(user, rejectedMessage);
-			/*
-			 * Supesses sprite bounce-back in the case of non-resistant portals
-			 */
-			if (getResistance() != 0) {
-				user.stop();
-				user.clearPath();
+
+			if (rejectedAction != null) {
+				rejectedAction.fire((Player) user, null, null);
+			}
+
+			if (forceStop) {
+				if (user instanceof Player) {
+					((Player) user).forceStop();
+				} else {
+					user.stop();
+				}
+			} else {
+				/*
+				 * Suppresses sprite bounce-back in the case of non-resistant portals
+				 */
+				if (getResistance() != 0) {
+					user.stop();
+					user.clearPath();
+				}
 			}
 		}
 	}
@@ -329,6 +349,26 @@ abstract class AccessCheckingPortal extends Portal {
 	 */
 	public void setRequiredPassword(final String password) {
 	    requiredPassword = password;
+	}
+
+	/**
+	 * Initiates an action to take on rejection.
+	 *
+	 * @param rejectedAction
+	 * 		ChatAction to execute.
+	 */
+	public void setRejectedAction(ChatAction rejectedAction) {
+		this.rejectedAction = rejectedAction;
+	}
+
+	/**
+	 * Sets flag to override continuous movement & force entity to stop.
+	 *
+	 * @param forceStop
+	 * 		If <code>true</code>, entity is forced to stop movement.
+	 */
+	public void setForceStop(final boolean forceStop) {
+		this.forceStop = forceStop;
 	}
 
 	/**

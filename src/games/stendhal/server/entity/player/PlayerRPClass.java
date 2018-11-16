@@ -14,6 +14,7 @@ package games.stendhal.server.entity.player;
 
 import static games.stendhal.common.constants.Actions.AUTOWALK;
 import static games.stendhal.common.constants.Actions.MOVE_CONTINUOUS;
+import static games.stendhal.common.constants.General.COMBAT_KARMA;
 
 import games.stendhal.common.constants.Events;
 import marauroa.common.game.Definition;
@@ -40,6 +41,7 @@ public class PlayerRPClass {
 //		player.addAttribute("private_text", Type.LONG_STRING, (byte) (Definition.HIDDEN | Definition.VOLATILE));
 
 		player.addRPEvent(Events.PRIVATE_TEXT, Definition.PRIVATE);
+		player.addRPEvent(Events.HEADLESS_PRIVATE_TEXT, Definition.PRIVATE);
 		player.addRPEvent(Events.PLAYER_LOGGED_ON, Definition.PRIVATE);
 		player.addRPEvent(Events.PLAYER_LOGGED_OUT, Definition.PRIVATE);
 		player.addRPEvent(Events.TRADE_STATE_CHANGE, Definition.PRIVATE);
@@ -48,7 +50,7 @@ public class PlayerRPClass {
 		player.addAttribute("dead", Type.FLAG, Definition.PRIVATE);
 
 		player.addAttribute("outfit", Type.INT);
-		player.addAttribute("outfit_org", Type.INT, Definition.HIDDEN);
+		player.addAttribute("outfit_org", Type.INT, Definition.PRIVATE);
 		player.addAttribute("outfit_colors", Type.MAP);
 		player.addAttribute("outfit_expire_age", Type.INT, Definition.HIDDEN);
 
@@ -58,6 +60,9 @@ public class PlayerRPClass {
 		/* Player movement. */
 		player.addAttribute(AUTOWALK, Type.FLAG, Definition.VOLATILE);
 		player.addAttribute(MOVE_CONTINUOUS, Type.FLAG, Definition.VOLATILE);
+
+		/* setting for using karma during combat */
+		player.addAttribute(COMBAT_KARMA, Type.STRING, Definition.PRIVATE);
 
 		// Use this for admin menus and usage.
 		player.addAttribute("admin", Type.FLAG);

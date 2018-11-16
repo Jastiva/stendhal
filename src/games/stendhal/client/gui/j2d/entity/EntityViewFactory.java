@@ -78,7 +78,7 @@ public class EntityViewFactory {
 
 			// hack to hide blood
 			if (entityClass == Blood2DView.class) {
-				boolean showBlood = Boolean.parseBoolean(WtWindowManager.getInstance().getProperty("gamescreen.blood", "true"));
+				boolean showBlood = WtWindowManager.getInstance().getPropertyBoolean("gamescreen.blood", true);
 				if (!showBlood) {
 					return null;
 				}
@@ -205,6 +205,7 @@ public class EntityViewFactory {
 
 		register("useable_entity", null, null, UseableEntity2DView.class);
 
+		register("flyover", null, null, FlyOverArea2DView.class);
 		register("wall", null, null, Wall2DView.class);
 		register("walkblocker", null, null, WalkBlocker2DView.class);
 		register("well_source", null, null, UseableEntity2DView.class);

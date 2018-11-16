@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <creatures xmlns="stendhal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="stendhal ../creatures.xsd ">
-  
+
   <!-- START: chaos -->
-  
+
   <creature name="chaos green dragonrider">
     <type class="huge_animal" subclass="chaos_green_dragonrider" tileid="huge_animal.png:3"/>
     <description>You see a chaos green dragonrider. Don't misjudge him as to believe it's a normal green dragon, as it is controlled by a mysterious sorcerer seated on his back.</description>
     <attributes>
       <atk value="867"/>
+      <ratk value="867"/>
       <def value="98"/>
       <hp value="2022"/>
       <speed value="1.0"/>
@@ -17,7 +18,7 @@
     <level value="145"/>
     <experience value="31900"/>
     <respawn value="10600"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="money" quantity="[90,200]" probability="100.0"/>
       <item value="greater potion" quantity="[1,2]" probability="50.0"/>
@@ -44,12 +45,13 @@
       <profile name="strategy" params="archer(9),,dual attack"/>
     </ai>
   </creature>
-  
+
   <creature name="chaos red dragonrider">
     <type class="huge_animal" subclass="chaos_red_dragonrider" tileid="huge_animal.png:11"/>
     <description>You see a chaos red dragonrider. He might look like a red dragon, but the sorcerer seated on his back guides him to give even more strength out.</description>
     <attributes>
       <atk value="1044"/>
+      <ratk value="1044"/>
       <def value="107"/>
       <hp value="3618"/>
       <speed value="1.0"/>
@@ -58,7 +60,7 @@
     <level value="195"/>
     <experience value="75300"/>
     <respawn value="22600"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="money" quantity="[90,200]" probability="100.0"/>
       <item value="greater potion" quantity="[1,3]" probability="50.0"/>
@@ -84,11 +86,11 @@
       <profile name="strategy" params="archer(9),,dual attack"/>
     </ai>
   </creature>
-  
+
   <!-- END: chaos -->
-  
+
   <!-- START: dragon -->
-  
+
   <creature name="green dragon">
     <type class="huge_animal" subclass="green_dragon" tileid="huge_animal.png:6"/>
     <description>You see a green dragon. He looks very tall and strong.</description>
@@ -102,7 +104,7 @@
     <level value="50"/>
     <experience value="1750"/>
     <respawn value="1660"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="money" quantity="[10,60]" probability="100.0"/>
       <item value="greater potion" quantity="[1,1]" probability="50.0"/>
@@ -125,12 +127,13 @@
    	  <profile name="attack weakest"/>
     </ai>
   </creature>
-  
+
   <creature name="bone dragon">
     <type class="huge_animal" subclass="bone_dragon" tileid="huge_animal.png:2"/>
     <description>You see a bone dragon. It's been said that there are creatures with enough will to live that their souls still cling to life even as their flesh and blood has failed them. This is living proof.</description>
     <attributes>
       <atk value="435"/>
+      <ratk value="435"/>
       <def value="48"/>
       <hp value="400"/>
       <speed value="1.0"/>
@@ -162,12 +165,13 @@
       <profile name="strategy" params="archer,,dual attack"/>
     </ai>
   </creature>
-  
+
   <creature name="blue dragon">
     <type class="huge_animal" subclass="blue_dragon" tileid="huge_animal.png:1"/>
     <description>You see a blue dragon. It has a very beautiful blue skin which shimmers mysteriously in the light. But don't forget that it also has claws and teeth!</description>
     <attributes>
       <atk value="511"/>
+      <ratk value="511"/>
       <def value="57"/>
       <hp value="900"/>
       <speed value="1.0"/>
@@ -176,7 +180,7 @@
     <level value="70"/>
     <experience value="4130"/>
     <respawn value="2240"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="greater potion" quantity="[1,2]" probability="80.0"/>
       <item value="money" quantity="[20,100]" probability="100.0"/>
@@ -203,12 +207,13 @@
       <profile name="patrolling"/>
     </ai>
   </creature>
-  
+
   <creature name="red dragon">
     <type class="huge_animal" subclass="red_dragon" tileid="huge_animal.png:7"/>
     <description>You see into the emerald eyes of a red dragon. With these it can spot prey in the darkness. It's red scales serve it well, reflecting any light that shines on them blinding enemies. The scales are prized for their beauty, and difficult to obtain from such a ferocious beast.</description>
     <attributes>
       <atk value="777"/>
+      <ratk value="777"/>
       <def value="115"/>
       <hp value="1200"/>
       <speed value="1.0"/>
@@ -217,7 +222,7 @@
     <level value="125"/>
     <experience value="20700"/>
     <respawn value="7300"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="greater potion" quantity="[2,4]" probability="80.0"/>
       <item value="money" quantity="[60,160]" probability="100.0"/>
@@ -241,12 +246,13 @@
       <profile name="strategy" params="archer,attack weakest,dual attack"/>
     </ai>
   </creature>
-  
+
   <creature name="black dragon">
     <type class="mythical_animal" subclass="black_dragon" tileid="mythical_animal.png:0"/>
     <description>You see a black dragon. As you see this huge black creature you almost faint! If you concentrate you can feel the deep growling of it in your bones.</description>
     <attributes>
       <atk value="1227"/>
+      <ratk value="1227"/>
       <def value="127"/>
       <hp value="3300"/>
       <speed value="1.0"/>
@@ -255,7 +261,7 @@
     <level value="200"/>
     <experience value="82000"/>
     <respawn value="24000"/>
-    <corpse name="dragon_6x6" width="6" height="6"/>
+    <corpse name="dragon_6x6" harmless="bag_2x2" width="6" height="6"/>
     <drops>
       <item value="greater potion" quantity="[1,3]" probability="70.0"/>
       <item value="money" quantity="[300,1000]" probability="100.0"/>
@@ -282,16 +288,17 @@
       <profile name="strategy" params="archer(9),attack weakest,dual attack"/>
     </ai>
   </creature>
-  
+
   <!-- STOP: dragon -->
-  
+
   <!-- START: flying -->
-  
+
   <creature name="flying golden dragon">
     <type class="huge_animal" subclass="flying_golden_dragon" tileid="huger_animal.png:0"/>
     <description>You see a flying golden dragon. As it spreads its mighty wings you shiver... this mystical creature seems to have much power in it!</description>
     <attributes>
       <atk value="837"/>
+      <ratk value="837"/>
       <def value="138"/>
       <hp value="1100"/>
       <speed value="1.0"/>
@@ -300,7 +307,7 @@
     <level value="137"/>
     <experience value="25980"/>
     <respawn value="10000"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="mega potion" quantity="[1,1]" probability="50.0"/>
       <item value="money" quantity="[30,100]" probability="100.0"/>
@@ -327,12 +334,13 @@
       <profile name="strategy" params="archer,attack weakest,dual attack"/>
     </ai>
   </creature>
-  
+
   <creature name="twin headed dragon">
     <type class="huge_animal" subclass="twin_head_dragon" tileid="huge_animal.png:10"/>
     <description>You see a twin headed dragon. The two heads are staring at you with their four eyes!</description>
     <attributes>
       <atk value="836"/>
+      <ratk value="836"/>
       <def value="96"/>
       <hp value="1900"/>
       <speed value="1.0"/>
@@ -341,7 +349,7 @@
     <level value="139"/>
     <experience value="26100"/>
     <respawn value="11000"/>
-    <corpse name="dragon_3x3" width="3" height="3"/>
+    <corpse name="dragon_3x3" harmless="bag_2x2" width="3" height="3"/>
     <drops>
       <item value="mega potion" quantity="[1,2]" probability="80.0"/>
       <item value="money" quantity="[30,200]" probability="100.0"/>
@@ -366,7 +374,7 @@
       <profile name="strategy" params="archer,attack weakest,dual attack"/>
     </ai>
   </creature>
-  
+
   <!-- STOP: flying -->
-  
+
 </creatures>

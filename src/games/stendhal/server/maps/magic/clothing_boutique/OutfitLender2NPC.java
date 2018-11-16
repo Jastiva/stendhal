@@ -1,5 +1,5 @@
 /***************************************************************************
- *                   (C) Copyright 2003-2015 - Stendhal                    *
+ *                   (C) Copyright 2003-2018 - Stendhal                    *
  ***************************************************************************
  ***************************************************************************
  *                                                                         *
@@ -16,12 +16,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import games.stendhal.common.Direction;
+import games.stendhal.common.constants.Occasion;
 import games.stendhal.common.grammar.ItemParserResult;
 import games.stendhal.server.core.config.ZoneConfigurator;
 import games.stendhal.server.core.engine.StendhalRPZone;
 import games.stendhal.server.core.pathfinder.FixedPath;
 import games.stendhal.server.core.pathfinder.Node;
 import games.stendhal.server.entity.Outfit;
+import games.stendhal.server.entity.RPEntity;
 import games.stendhal.server.entity.npc.ConversationPhrases;
 import games.stendhal.server.entity.npc.ConversationStates;
 import games.stendhal.server.entity.npc.EventRaiser;
@@ -54,35 +57,37 @@ public class OutfitLender2NPC implements ZoneConfigurator {
 	}
 
 	private void initOutfits() {
+
 		// these outfits must be put on over existing outfit
 		// (what's null doesn't change that part of the outfit)
 		// so true means we put on over
 		// FIXME: Use new outfit system
-		  final Pair<Outfit, Boolean> GLASSES = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(86), null, null), true);
-		  final Pair<Outfit, Boolean> GOBLIN_FACE = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(88), null, null), true);
-		  final Pair<Outfit, Boolean> THING_FACE = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(87), null, null), true);
-		  final Pair<Outfit, Boolean> Umbrella = new Pair<Outfit, Boolean>(new Outfit(Integer.valueOf(07), null, null, null, null), true);
+		final Pair<Outfit, Boolean> GLASSES = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(86), null, null), true);
+		final Pair<Outfit, Boolean> GOBLIN_FACE = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(88), null, null), true);
+		final Pair<Outfit, Boolean> THING_FACE = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(87), null, null), true);
+		final Pair<Outfit, Boolean> Umbrella = new Pair<Outfit, Boolean>(new Outfit(Integer.valueOf(07), null, null, null, null), true);
 
 		// these outfits must replace the current outfit (what's null simply isn't there)
-		  final Pair<Outfit, Boolean> PURPLE_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(93)), false);
-		  final Pair<Outfit, Boolean> GREEN_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(89)), false);
-		  final Pair<Outfit, Boolean> RED_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(88)), false);
-		  final Pair<Outfit, Boolean> BLUE_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(91)), false);
-		  final Pair<Outfit, Boolean> GINGERBREAD_MAN = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(92)), false);
+		final Pair<Outfit, Boolean> PURPLE_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(93)), false);
+		final Pair<Outfit, Boolean> GREEN_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(89)), false);
+		final Pair<Outfit, Boolean> RED_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(88)), false);
+		final Pair<Outfit, Boolean> BLUE_SLIME = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(91)), false);
+		final Pair<Outfit, Boolean> GINGERBREAD_MAN = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(92)), false);
+		final Pair<Outfit, Boolean> WHITE_CAT = new Pair<Outfit, Boolean>(new Outfit(null, 0, 98, 0, 78), false);
+		final Pair<Outfit, Boolean> BLACK_CAT = new Pair<Outfit, Boolean>(new Outfit(null, 0, 98, 0, 79), false);
 
-
-			outfitTypes.put("glasses", GLASSES);
-			outfitTypes.put("goblin face", GOBLIN_FACE);
-			outfitTypes.put("thing face", THING_FACE);
-			outfitTypes.put("umbrella", Umbrella);
-			outfitTypes.put("purple slime", PURPLE_SLIME);
-			outfitTypes.put("green slime", GREEN_SLIME);
-			outfitTypes.put("red slime", RED_SLIME);
-			outfitTypes.put("blue slime", BLUE_SLIME);
-			outfitTypes.put("gingerbread man", GINGERBREAD_MAN);
+		outfitTypes.put("glasses", GLASSES);
+		outfitTypes.put("goblin face", GOBLIN_FACE);
+		outfitTypes.put("thing face", THING_FACE);
+		outfitTypes.put("umbrella", Umbrella);
+		outfitTypes.put("purple slime", PURPLE_SLIME);
+		outfitTypes.put("green slime", GREEN_SLIME);
+		outfitTypes.put("red slime", RED_SLIME);
+		outfitTypes.put("blue slime", BLUE_SLIME);
+		outfitTypes.put("gingerbread man", GINGERBREAD_MAN);
+		outfitTypes.put("white cat", WHITE_CAT);
+		outfitTypes.put("black cat", BLACK_CAT);
 	}
-
-
 
 	private void buildBoutiqueArea(final StendhalRPZone zone) {
 		final SpeakerNPC npc = new SpeakerNPC("Saskia") {
@@ -167,6 +172,8 @@ public class OutfitLender2NPC implements ZoneConfigurator {
 				priceList.put("green slime", (int) (N * 3000));
 				priceList.put("gingerbread man", (int) (N * 1200));
 				priceList.put("umbrella", (int) (N * 300));
+				priceList.put("black cat", (int) (N * 4500));
+				priceList.put("white cat", (int) (N * 4500));
 			    addGreeting("Hello, I hope you are enjoying looking around our gorgeous boutique.");
 				addQuest("Just look fabulous!");
 				add(
@@ -174,7 +181,13 @@ public class OutfitLender2NPC implements ZoneConfigurator {
 					ConversationPhrases.OFFER_MESSAGES,
 					null,
 					ConversationStates.ATTENDING,
-					"Please tell me which outfit you would like, ask to #hire #glasses, #hire a #goblin #face, #hire a #thing #face, #hire a #umbrella, #hire a #purple #slime outfit, #hire a #green #slime, #hire a #red #slime, #hire a #blue #slime, or #hire a #gingerbread #man outfit.",
+					"Please tell me which outfit you would like,"
+					+ " ask to #hire #glasses, #hire a #goblin #face,"
+					+ " #hire a #thing #face, #hire a #umbrella,"
+					+ " #hire a #purple #slime outfit, #hire a #green #slime,"
+					+ " #hire a #red #slime, #hire a #blue #slime,"
+					+ " #hire a #gingerbread #man outfit,"
+					+ " #hire a #white #cat, or #hire a #black #cat.",
 					new ExamineChatAction("outfits2.png", "Outfits", "Price varies"));
 				addJob("I work with magic in a fun way! Ask about the #offer.");
 				addHelp("I can cast a spell to dress you in a magical outfit. They wear off after some time. I hope I can #offer you something you like. If not Liliana also rents out from a different range.");
@@ -182,13 +195,28 @@ public class OutfitLender2NPC implements ZoneConfigurator {
 				final OutfitChangerBehaviour behaviour = new SpecialOutfitChangerBehaviour(priceList, endurance, "Your magical outfit has worn off.");
 				new OutfitChangerAdder().addOutfitChanger(this, behaviour, "hire", false, false);
 			}
+
+			@Override
+			protected void onGoodbye(RPEntity player) {
+				if (Occasion.MINETOWN) {
+					setDirection(Direction.DOWN);
+				}
+			}
 		};
 
 		npc.setEntityClass("wizardwomannpc");
-		npc.setPosition(5, 7);
 		npc.initHP(100);
 		npc.setDescription("You see Saskia. She works in the Magic City boutique.");
+
+		if (Occasion.MINETOWN) {
+			npc.clearPath();
+			npc.stop();
+			npc.setDirection(Direction.DOWN);
+			npc.setPosition(42, 9);
+		} else {
+			npc.setPosition(5, 7);
+		}
+
 		zone.add(npc);
 	}
 }
-

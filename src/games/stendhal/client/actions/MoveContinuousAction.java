@@ -14,11 +14,10 @@ package games.stendhal.client.actions;
 import static games.stendhal.common.constants.Actions.MOVE_CONTINUOUS;
 import static games.stendhal.common.constants.Actions.TYPE;
 
-import javax.swing.JCheckBox;
-
 import games.stendhal.client.ClientSingletonRepository;
+import games.stendhal.client.StendhalClient;
+import games.stendhal.client.gui.chatlog.EventLine;
 import games.stendhal.client.gui.chatlog.HeaderLessEventLine;
-import games.stendhal.client.gui.settings.SettingsDialog;
 import games.stendhal.client.gui.wt.core.WtWindowManager;
 import games.stendhal.common.NotificationType;
 import marauroa.common.game.RPAction;
@@ -46,17 +45,10 @@ public class MoveContinuousAction implements SlashAction {
 	@Override
 	public boolean execute(String[] params, String remainder) {
 		WtWindowManager wm = WtWindowManager.getInstance();
-		boolean enabled = Boolean.parseBoolean(wm.getProperty(MOVE_CONTINUOUS, "false"));
+		boolean enabled = wm.getPropertyBoolean(MOVE_CONTINUOUS, false);
 		wm.setProperty(MOVE_CONTINUOUS, Boolean.toString(!enabled));
 
-		// Was not called from settings GUI so we need to update check box state.
-		JCheckBox moveContinuousToggle = SettingsDialog.getMoveContinuousToggle();
-		if (moveContinuousToggle != null) {
-			moveContinuousToggle.setSelected(!enabled);
-			return true;
-		} else {
-			return sendAction(!enabled);
-		}
+		return sendAction(!enabled);
 	}
 
 	/**
@@ -70,6 +62,11 @@ public class MoveContinuousAction implements SlashAction {
 	 *		<code>true</code>
 	 */
 	public boolean sendAction(final boolean enable, final boolean notify) {
+		if (!StendhalClient.serverVersionAtLeast("1.27.5")) {
+			ClientSingletonRepository.getUserInterface().addEventLine(new EventLine("",
+					"The server version does not support continuous movement mode.", NotificationType.SERVER));
+			return false;
+		}
 		// Create action to be sent to server.
 		final RPAction action = new RPAction();
 		action.put(TYPE, MOVE_CONTINUOUS);

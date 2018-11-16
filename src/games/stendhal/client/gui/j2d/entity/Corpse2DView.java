@@ -100,18 +100,16 @@ class Corpse2DView<T extends Corpse> extends Entity2DView<T> {
 	 */
 	@Override
 	protected void buildRepresentation(T entity) {
-		final String imageName = entity.getRPObject().get("image");
-		final String harmlessImageName = entity.getRPObject().get("harmless_image");
-		Sprite sprite = null;
 		ZoneInfo info = ZoneInfo.get();
-		boolean showBlood = Boolean.parseBoolean(WtWindowManager.getInstance().getProperty("gamescreen.blood", "true"));
+		boolean showBlood = WtWindowManager.getInstance().getPropertyBoolean("gamescreen.blood", true);
+		String imageName;
 		if (showBlood) {
-			sprite = SpriteStore.get().getModifiedSprite(translate("corpse/"  + imageName),
-					info.getZoneColor(), info.getColorMethod());
+			imageName = entity.getRPObject().get("image");
 		} else {
-			sprite = SpriteStore.get().getModifiedSprite(translate("corpse/" + harmlessImageName),
-						info.getZoneColor(), info.getColorMethod());
+			imageName = entity.getRPObject().get("harmless_image");
 		}
+		Sprite sprite = SpriteStore.get().getModifiedSprite(translate("corpse/"  + imageName),
+				info.getZoneColor(), info.getColorMethod());
 
 		width = sprite.getWidth();
 		height = sprite.getHeight();
@@ -342,21 +340,22 @@ class Corpse2DView<T extends Corpse> extends Entity2DView<T> {
 		// be auto inspected anyway
 		if (!autoOpenedAlready && inspector != null) {
 			autoOpenedAlready = true;
-			boolean autoRaiseCorpse = Boolean.parseBoolean(WtWindowManager.getInstance().getProperty("gamescreen.autoinspectcorpses", "true"));
-			if (autoRaiseCorpse) {
-				if ((entity.getCorpseOwner() != null) && entity.getCorpseOwner().equals(User.getCharacterName()) && !entity.isEmpty()) {
-					/*
-					 * We are in mid-draw of the screen. Defer auto inspect to
-					 * avoid messing with the component layout while drawing.
-					 * Fixes flicker in certain situations (bug #3302772).
-					 */
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							onAction(ActionType.INSPECT);
-						}
-					});
-				}
+			boolean autoRaiseCorpse = WtWindowManager.getInstance().getPropertyBoolean("gamescreen.autoinspectcorpses", true);
+			if (autoRaiseCorpse
+					&& (entity.getCorpseOwner() != null)
+					&& entity.getCorpseOwner().equals(User.getCharacterName())
+					&& !entity.isEmpty()) {
+				/*
+				 * We are in mid-draw of the screen. Defer auto inspect to
+				 * avoid messing with the component layout while drawing.
+				 * Fixes flicker in certain situations (bug #3302772).
+				 */
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						onAction(ActionType.INSPECT);
+					}
+				});
 			}
 		}
 	}

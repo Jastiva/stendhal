@@ -49,7 +49,6 @@ import games.stendhal.client.sprite.Sprite;
 import games.stendhal.client.sprite.SpriteStore;
 import games.stendhal.common.Outfits;
 import games.stendhal.common.constants.Actions;
-import games.stendhal.common.constants.Testing;
 import marauroa.common.game.RPAction;
 
 /**
@@ -64,8 +63,6 @@ class OutfitDialog extends JDialog {
 	private static final int SLIDER_WIDTH = 80;
 
 	private final SelectorModel hair = new SelectorModel(Outfits.HAIR_OUTFITS);
-	private final SelectorModel eyes = new SelectorModel(Outfits.EYES_OUTFITS);
-	private final SelectorModel mouth = new SelectorModel(Outfits.MOUTH_OUTFITS);
 	private final SelectorModel head = new SelectorModel(Outfits.HEAD_OUTFITS);
 	private final SelectorModel body = new SelectorModel(Outfits.BODY_OUTFITS);
 	private final SelectorModel dress = new SelectorModel(Outfits.CLOTHES_OUTFITS);
@@ -86,10 +83,6 @@ class OutfitDialog extends JDialog {
 
 	/** Label containing the hair image. */
 	private OutfitLabel hairLabel;
-	/** Label containing the eyes image. */
-	private OutfitLabel eyesLabel;
-	/** Label containing the mouth image. */
-	private OutfitLabel mouthLabel;
 	/** Label containing the head image. */
 	private OutfitLabel headLabel;
 	/** Label containing the body image. */
@@ -132,14 +125,6 @@ class OutfitDialog extends JDialog {
 		dress.addListener(dressLabel);
 		dress.addListener(outfitLabel);
 
-		/* TODO: Remove when new outfit system implemented */
-		if (Testing.OUTFITS) {
-			eyes.addListener(eyesLabel);
-			eyes.addListener(outfitLabel);
-			mouth.addListener(mouthLabel);
-			mouth.addListener(outfitLabel);
-		}
-
 		// analyse current outfit
 		int bodiesIndex = outfit % 100;
 		outfit = outfit / 100;
@@ -161,60 +146,9 @@ class OutfitDialog extends JDialog {
 		body.setIndex(bodiesIndex);
 		dress.setIndex(clothesIndex);
 
-		/* TODO: Remove when new outfit system implemented */
-		if (Testing.OUTFITS) {
-			/* FIXME: How to get eyes & mouths index? */
-			int eyesIndex = 0;
-			int mouthsIndex = 0;
-
-			eyes.setIndex(eyesIndex);
-			mouth.setIndex(mouthsIndex);
-		}
-
 		pack();
 		WindowUtils.closeOnEscape(this);
 		WindowUtils.trackLocation(this, "outfit", false);
-	}
-
-	/**
-	 * Create a new outfit dialog with extended outfit features: Currently
-	 * mouth and eyes.
-	 *
-	 * @param parent
-	 * 		The parent object of this dialog
-	 * @param title
-	 * 		Text to be displayed in title bar
-	 * @param outfit
-	 * 		10-digit code representing original outfit features (old outfit
-	 * 		system)
-	 * @param outfitColor
-	 * 		Coloring information for outfit parts (<b>Note that outfitColor can
-	 * 		be modified by the dialog</b>)
-	 */
-	OutfitDialog(final Frame parent, final String title, long outfit,
-			final OutfitColor outfitColor) {
-		this(parent, title, (int)(outfit / 10000), outfitColor);
-
-		// Follow the model changes
-		eyes.addListener(eyesLabel);
-		eyes.addListener(outfitLabel);
-		mouth.addListener(mouthLabel);
-		mouth.addListener(outfitLabel);
-
-		// Analyze current outfit
-		int mouthsIndex = (int) (outfit % 100);
-		outfit = outfit / 100;
-		int eyesIndex = (int) (outfit % 100);
-
-		// Reset special outfits
-		mouthsIndex = checkIndex(mouthsIndex, mouth);
-		eyesIndex = checkIndex(eyesIndex, eyes);
-
-		// Set the current outfit indices; this will update the labels as well
-		eyes.setIndex(eyesIndex);
-		mouth.setIndex(mouthsIndex);
-
-		pack();
 	}
 
 	/**
@@ -261,30 +195,6 @@ class OutfitDialog extends JDialog {
 		hairLabel = new OutfitLabel(hairRetriever);
 		partialsColumn.add(createSelector(hair, hairLabel));
 
-		/* TODO: Remove condition after outfit testing is finished. */
-		SpriteRetriever eyesRetriever = null, mouthRetriever = null;
-		if (Testing.OUTFITS) {
-			// Eyes
-			eyesRetriever = new SpriteRetriever() {
-				@Override
-				public Sprite getSprite() {
-					return getEyesSprite();
-				}
-			};
-			eyesLabel = new OutfitLabel(eyesRetriever);
-			partialsColumn.add(createSelector(eyes, eyesLabel));
-
-			// Mouth
-			mouthRetriever = new SpriteRetriever() {
-				@Override
-				public Sprite getSprite() {
-					return getMouthSprite();
-				}
-			};
-			mouthLabel = new OutfitLabel(mouthRetriever);
-			partialsColumn.add(createSelector(mouth, mouthLabel));
-		}
-
 		// Head
 		SpriteRetriever headRetriever = new SpriteRetriever() {
 			@Override
@@ -324,14 +234,6 @@ class OutfitDialog extends JDialog {
 		selector.setAlignmentX(CENTER_ALIGNMENT);
 		column.add(selector);
 
-		// TODO: Remove condition after outfit testing is finished
-		if (Testing.OUTFITS) {
-			/* eyes color */
-			selector = createColorSelector("Eyes", OutfitColor.EYES, eyesLabel);
-			selector.setAlignmentX(CENTER_ALIGNMENT);
-			column.add(selector);
-		}
-
 		/* skin color */
 		selector = createColorSelector("Skin", OutfitColor.SKIN, true, bodyLabel,
 				headLabel);
@@ -348,16 +250,7 @@ class OutfitDialog extends JDialog {
 		column = SBoxLayout.createContainer(SBoxLayout.VERTICAL, pad);
 		column.setAlignmentY(CENTER_ALIGNMENT);
 		content.add(column);
-
-		/* TODO: Remove condition after outfit testing is finished. */
-		if (Testing.OUTFITS) {
-			outfitLabel = new OutfitLabel(bodyRetriever, dressRetriever,
-					headRetriever, mouthRetriever, eyesRetriever,
-					hairRetriever);
-		} else {
-			outfitLabel = new OutfitLabel(bodyRetriever, dressRetriever,
-					headRetriever, hairRetriever);
-		}
+		outfitLabel = new OutfitLabel(bodyRetriever, dressRetriever, headRetriever, hairRetriever);
 		outfitLabel.setAlignmentX(CENTER_ALIGNMENT);
 		column.add(outfitLabel);
 
@@ -439,10 +332,6 @@ class OutfitDialog extends JDialog {
 
 		outfitLabel.changed();
 		hairLabel.changed();
-		/* TODO: Remove condition after outfit testing is finished. */
-		if (Testing.OUTFITS) {
-			eyesLabel.changed();
-		}
 		headLabel.changed();
 		dressLabel.changed();
 		bodyLabel.changed();
@@ -455,28 +344,6 @@ class OutfitDialog extends JDialog {
 	 */
 	private Sprite getHairSprite() {
 		return store.getTile(ostore.getHairSprite(hair.getIndex(), outfitColor),
-				PLAYER_WIDTH, direction * PLAYER_HEIGHT, PLAYER_WIDTH,
-				PLAYER_HEIGHT);
-	}
-
-	/**
-	 * Get the eyes sprite.
-	 *
-	 * @return eyes sprite
-	 */
-	private Sprite getEyesSprite() {
-		return store.getTile(ostore.getEyesSprite(eyes.getIndex(), outfitColor),
-				PLAYER_WIDTH, direction * PLAYER_HEIGHT, PLAYER_WIDTH,
-				PLAYER_HEIGHT);
-	}
-
-	/**
-	 * Get the mouth sprite.
-	 *
-	 * @return mouth sprite
-	 */
-	private Sprite getMouthSprite() {
-		return store.getTile(ostore.getMouthSprite(mouth.getIndex()),
 				PLAYER_WIDTH, direction * PLAYER_HEIGHT, PLAYER_WIDTH,
 				PLAYER_HEIGHT);
 	}
@@ -636,36 +503,16 @@ class OutfitDialog extends JDialog {
 		Color color;
 
 		final RPAction rpOutfitAction = new RPAction();
-		/* TODO: Remove condition when outfit testing is finished */
-		if (Testing.OUTFITS) {
-			rpOutfitAction.put(Actions.TYPE, "outfit");
-			long value = (body.getIndex() + (dress.getIndex() * 100)
-					+ (head.getIndex() * (int)Math.pow(100, 2))
-					+ (mouth.getIndex() * (int)Math.pow(100, 3))
-					+ (eyes.getIndex() * (int)Math.pow(100, 4))
-					+ (hair.getIndex() * (int)Math.pow(100, 5)));
-			rpOutfitAction.put(Actions.VALUE, value);
-		} else {
-			rpOutfitAction.put(Actions.TYPE, "outfit");
-			rpOutfitAction.put(Actions.VALUE, body.getIndex()
-					+ (dress.getIndex() * 100)
-					+ (head.getIndex() * 100 * 100)
-					+ (hair.getIndex() * 100 * 100 * 100));
-		}
+		rpOutfitAction.put(Actions.TYPE, "outfit");
+		rpOutfitAction.put(Actions.VALUE, body.getIndex()
+				+ (dress.getIndex() * 100)
+				+ (head.getIndex() * 100 * 100)
+				+ (hair.getIndex() * 100 * 100 * 100));
 
 		/* hair color */
 		color = outfitColor.getColor(OutfitColor.HAIR);
 		if (color != null) {
 			rpOutfitAction.put(OutfitColor.HAIR, color.getRGB());
-		}
-
-		/* TODO: Remove condition after outfit testing is finished. */
-		if (Testing.OUTFITS) {
-			/* eyes color */
-			color = outfitColor.getColor(OutfitColor.EYES);
-			if (color != null) {
-				rpOutfitAction.put(OutfitColor.EYES, color.getRGB());
-			}
 		}
 
 		/* dress color */
@@ -693,11 +540,6 @@ class OutfitDialog extends JDialog {
 			bodyLabel.setBorder(style.getBorderDown());
 			dressLabel.setBorder(style.getBorderDown());
 			headLabel.setBorder(style.getBorderDown());
-			/* TODO: Remove condition after outfit testing is finished */
-			if (Testing.OUTFITS) {
-				mouthLabel.setBorder(style.getBorderDown());
-				eyesLabel.setBorder(style.getBorderDown());
-			}
 			hairLabel.setBorder(style.getBorderDown());
 			outfitLabel.setBorder(style.getBorderDown());
 		}
@@ -734,30 +576,6 @@ class OutfitDialog extends JDialog {
 		for (ResetListener l : resetListeners) {
 			l.reset();
 		}
-	}
-
-	/**
-	 * Set the state of the selector for extened outfit features: Currently
-	 * mouth and eyes.
-	 *
-	 * @param outfit
-	 * 		14-digit integer representing extended features
-	 * @param colors
-	 * 		Color state of outfit parts (will not be modiefied like the one
-	 * 		passed to constructor)
-	 */
-	void setState(long outfit, final OutfitColor colors) {
-		// Analyze the outfit code
-		int mouthsIndex = (int) (outfit % 100);
-		outfit = outfit / 100;
-		int eyesIndex = (int) (outfit % 100);
-		outfit = outfit / 100;
-
-		mouth.setIndex(mouthsIndex);
-		eyes.setIndex(eyesIndex);
-
-		// Run code for original (old) outfit system to update listeners
-		this.setState((int)outfit, colors);
 	}
 
 	/**

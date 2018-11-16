@@ -12,9 +12,8 @@
  ***************************************************************************/
 package games.stendhal.server.entity;
 
-import static games.stendhal.common.constants.Common.PATHSET;
+import static games.stendhal.common.constants.General.PATHSET;
 
-import games.stendhal.common.constants.Testing;
 import marauroa.common.game.Definition;
 import marauroa.common.game.Definition.Type;
 import marauroa.common.game.RPClass;
@@ -51,18 +50,10 @@ public class RPEntityRPClass {
         entity.addAttribute("def_xp", Type.INT, Definition.PRIVATE);
         entity.addAttribute("def_item", Type.INT,
                 (byte) (Definition.PRIVATE | Definition.VOLATILE));
-        /* TODO: Remove condition when ranged stat testing is finished. */
-        if (Testing.COMBAT) {
-        	// FIXME: remove VOLATILE when ranged stat is ready
-//        	entity.addAttribute("ratk", Type.SHORT, Definition.PRIVATE);
-//        	entity.addAttribute("ratk_xp", Type.INT, Definition.PRIVATE);
-	        entity.addAttribute("ratk", Type.SHORT,
-	        		(byte) (Definition.PRIVATE | Definition.VOLATILE));
-	        entity.addAttribute("ratk_xp", Type.INT,
-	        		(byte) (Definition.PRIVATE | Definition.VOLATILE));
-	        entity.addAttribute("ratk_item", Type.INT,
-	                (byte) (Definition.PRIVATE | Definition.VOLATILE));
-        }
+        entity.addAttribute("ratk", Type.SHORT, Definition.PRIVATE);
+        entity.addAttribute("ratk_xp", Type.INT, Definition.PRIVATE);
+        entity.addAttribute("ratk_item", Type.INT,
+                (byte) (Definition.PRIVATE | Definition.VOLATILE));
 
         entity.addAttribute("risk", Type.BYTE, Definition.VOLATILE); // obsolete, do not use
         entity.addAttribute("damage", Type.INT, Definition.VOLATILE); // obsolete, do not use
@@ -76,6 +67,7 @@ public class RPEntityRPClass {
 
         entity.addAttribute("unnamed", Type.FLAG, Definition.VOLATILE);
         entity.addAttribute("no_hpbar", Type.FLAG, Definition.VOLATILE);
+        entity.addAttribute("no_attack", Type.FLAG, Definition.VOLATILE);
 
         // Jobs
         entity.addAttribute("job_merchant", Type.FLAG, Definition.VOLATILE);

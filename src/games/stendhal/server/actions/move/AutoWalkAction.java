@@ -14,7 +14,7 @@ package games.stendhal.server.actions.move;
 import static games.stendhal.common.constants.Actions.AUTOWALK;
 import static games.stendhal.common.constants.Actions.MODE;
 import static games.stendhal.common.constants.Actions.WALK;
-import static games.stendhal.common.constants.Common.PATHSET;
+import static games.stendhal.common.constants.General.PATHSET;
 
 import games.stendhal.common.Direction;
 import games.stendhal.server.actions.ActionListener;
@@ -28,7 +28,7 @@ import marauroa.common.game.RPAction;
  * the action is executed with the MODE attribute set to "stop" it will
  * exclusively stop the entity's movement and set auto-walking off. Otherwise
  * it will toggle auto-walk.
- * 
+ *
  * To enable:
  * - Execute slash command "/walk".
  * - Right-click player and select "walk".

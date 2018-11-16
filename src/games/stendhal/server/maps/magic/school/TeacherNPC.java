@@ -12,6 +12,7 @@
  ***************************************************************************/
 package games.stendhal.server.maps.magic.school;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +67,10 @@ public class TeacherNPC implements ZoneConfigurator {
 		};
 
 		npc.setDescription("You see a witch flying on a broomstick. She appears to be instructing some pupils.");
-		npc.setEntityClass("noimagenpc"); /* witch3npc */
+		npc.setEntityClass("witch3npc");
 		npc.setPosition(29, 19);
 		npc.initHP(100);
+		npc.setSounds(Arrays.asList("witch-cackle-1"));
 		zone.add(npc);
 	}
 }

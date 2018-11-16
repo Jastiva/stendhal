@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License as        *
- *   published by the Free Software Foundation; either version 3 of the    * 
+ *   published by the Free Software Foundation; either version 3 of the    *
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
@@ -16,12 +16,15 @@ var stendhal = window.stendhal = window.stendhal || {};
 
 stendhal.main = {
 	errorCounter: 0,
+	zoneFile: null,
 
 	onDataMap: function(data) {
 		var zoneinfo = {};
 		var deserializer = marauroa.Deserializer.fromBase64(data);
 		deserializer.readAttributes(zoneinfo);
 		document.getElementById("zoneinfo").textContent = zoneinfo["readable_name"];
+		console.log("zoneinfo", zoneinfo);
+		stendhal.main.zoneFile = zoneinfo["file"];
 		// Object { file: "Level 0/semos/city_easter.tmx", danger_level: "0.036429932929822995", zoneid: "", readable_name: "Semos city", id: "-1", color_method: "multiply" }
 	},
 
@@ -34,7 +37,7 @@ stendhal.main = {
 		marauroa.clientFramework.onDisconnect = function(reason, error){
 			stendhal.ui.chatLog.addLine("error", "Disconnected: " + error);
 		};
-	
+
 		marauroa.clientFramework.onLoginRequired = function() {
 			window.location = "/index.php?id=content/account/login&url="
 				+ escape(window.location.pathname + window.location.hash);
@@ -81,7 +84,7 @@ stendhal.main = {
 				}
 			}
 		};
-		
+
 		marauroa.clientFramework.onTransfer = function(items) {
 			for (var i in items) {
 				if (items[i]["name"].match(".data_map$")) {
@@ -98,7 +101,7 @@ stendhal.main = {
 				stendhal.ui.buddyList.update();
 				stendhal.ui.equip.update();
 				stendhal.ui.stats.update();
-				stendhal.data.map.load(marauroa.currentZoneName);
+				stendhal.data.map.load(marauroa.currentZoneName, stendhal.main.zoneFile);
 			}
 		}
 	},
@@ -123,6 +126,9 @@ stendhal.main = {
 		buddyList.addEventListener("mouseup", stendhal.ui.buddyList.onMouseUp);
 		buddyList.addEventListener("contextmenu", stendhal.ui.gamewindow.onContentMenu);
 
+		var menubutton = document.getElementById("menubutton");
+		menubutton.addEventListener("click", stendhal.ui.menu.onOpenAppMenu);
+
 		var chatinput = document.getElementById("chatinput");
 		chatinput.addEventListener("keydown", stendhal.ui.chatinput.onKeyDown);
 		chatinput.addEventListener("keyup", stendhal.ui.chatinput.onKeyUp);
@@ -139,14 +145,14 @@ stendhal.main = {
 		stendhal.main.registerMarauroaEventHandlers();
 		stendhal.main.registerBrowserEventHandlers();
 		marauroa.clientFramework.connect(null, null);
-		
+
 		if (document.getElementById("gamewindow")) {
 			stendhal.ui.gamewindow.draw.apply(stendhal.ui.gamewindow, arguments);
-			
+
 			document.addEventListener("click", function(e) {
 				if (e.target.dataItem) {
 					marauroa.clientFramework.sendAction({
-						type: "use", 
+						type: "use",
 						"target_path": e.target.dataItem.getIdPath(),
 						"zone": marauroa.currentZoneName
 					});
@@ -154,7 +160,7 @@ stendhal.main = {
 			});
 		}
 	},
-	
+
 	onerror: function(error) {
 		stendhal.main.errorCounter++;
 		if (stendhal.main.errorCounter > 5) {

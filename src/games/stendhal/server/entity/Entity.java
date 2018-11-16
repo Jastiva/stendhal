@@ -1,6 +1,5 @@
-/* $Id$ */
 /***************************************************************************
- *                      (C) Copyright 2003 - Marauroa                      *
+ *                    (C) Copyright 2003-2018 - Marauroa                   *
  ***************************************************************************
  ***************************************************************************
  *                                                                         *
@@ -12,7 +11,7 @@
  ***************************************************************************/
 package games.stendhal.server.entity;
 
-import static games.stendhal.server.core.engine.Translate._;
+import static games.stendhal.server.core.engine.Translate.getText;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -220,7 +219,7 @@ public abstract class Entity extends RPObject implements Killer {
 		if (has("description")) {
 			description = get("description");
 		}
-		return _(description);
+		return getText(description);
 	}
 
 	/**
@@ -443,6 +442,39 @@ public abstract class Entity extends RPObject implements Killer {
 		final Rectangle2D tempRect = new Rectangle.Double();
 		tempRect.setRect(ex, ey, area.getWidth(), area.getHeight());
 		return tempRect;
+	}
+
+	/**
+	 * Checks if entity is within bounds of an area.
+	 *
+	 * @param area
+	 * 		Area dimensions to check.
+	 * @return
+	 * 		<code>true</code> if entity is within area.
+	 */
+	public boolean isInArea(final String zoneid, final Rectangle2D area) {
+		if (!get("zoneid").equals(zoneid)) {
+			return false;
+		}
+		return area.contains(getInt("x"), getInt("y"));
+	}
+
+	/**
+	 * Checks if entity is within bounds of an area.
+	 *
+	 * @param x
+	 * 		Horizontal coordinate.
+	 * @param y
+	 * 		Vertical coordinate.
+	 * @param w
+	 * 		Width of area.
+	 * @param h
+	 * 		Height of area.
+	 * @return
+	 * 		<code>true</code> if entity is within area.
+	 */
+	public boolean isInArea(final String zoneid, final int x, final int y, final int w, final int h) {
+		return isInArea(zoneid, new Rectangle(x, y, w, h));
 	}
 
 	/**

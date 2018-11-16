@@ -21,7 +21,6 @@ import games.stendhal.client.gui.layout.SBoxLayout;
 import games.stendhal.client.gui.layout.SLayout;
 import games.stendhal.client.gui.styled.Style;
 import games.stendhal.client.gui.styled.StyleUtil;
-import games.stendhal.common.constants.Testing;
 
 /**
  * Display panel for status icons and player stats. The methods may be safely
@@ -61,16 +60,16 @@ class StatsPanel extends JPanel {
 		atkLabel = new StatLabel();
 		add(atkLabel, SLayout.EXPAND_X);
 
+		ratkLabel = new StatLabel();
+		add(ratkLabel, SLayout.EXPAND_X);
+		/* only show RATK stat if set by server
+		 *
+		 * TODO: this can be removed in future versions
+		 */
+		ratkLabel.setVisible(false);
+
 		defLabel = new StatLabel();
 		add(defLabel, SLayout.EXPAND_X);
-
-		/* FIXME: ranged stat is disabled until fully implemented */
-		if (Testing.COMBAT) {
-			ratkLabel = new StatLabel();
-			add(ratkLabel, SLayout.EXPAND_X);
-		} else {
-			ratkLabel = null;
-		}
 
 		xpLabel = new StatLabel();
 		add(xpLabel, SLayout.EXPAND_X);
@@ -115,6 +114,13 @@ class StatsPanel extends JPanel {
 	 * @param ratk
 	 */
 	void setRatk(String ratk) {
+		/* only show RATK stat if set by server
+		 *
+		 * TODO: this can be removed in future versions
+		 */
+		if (!ratkLabel.isVisible()) {
+			ratkLabel.setVisible(true);
+		}
 		ratkLabel.setText(ratk);
 	}
 
@@ -200,6 +206,13 @@ class StatsPanel extends JPanel {
 	 */
 	void setStatus(final StatusID ID, final boolean visible) {
 	    statusIcons.setStatus(ID, visible);
+	}
+
+	/**
+	 * Hide all status icons. This is called when the user entity is deleted.
+	 */
+	void resetStatuses() {
+		statusIcons.resetStatuses();
 	}
 
 	/**

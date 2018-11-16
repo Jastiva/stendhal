@@ -31,6 +31,7 @@ import games.stendhal.server.entity.npc.ConversationPhrases;
 import games.stendhal.server.entity.npc.ConversationStates;
 import games.stendhal.server.entity.npc.EventRaiser;
 import games.stendhal.server.entity.npc.SpeakerNPC;
+import games.stendhal.server.entity.npc.condition.GreetingMatchesNameCondition;
 import games.stendhal.server.entity.player.Player;
 import games.stendhal.server.util.TimeUtil;
 
@@ -39,13 +40,14 @@ import games.stendhal.server.util.TimeUtil;
  * QUEST: KillBlordroughs
  *
  * PARTICIPANTS: <ul>
- * <li> Despot Halb Errvl
+ * <li> Mrotho
  * <li> some creatures
  * </ul>
  *
  * STEPS:<ul>
- * <li> Despot asking you to kill 100 blordrough warriors.
- * <li> Kill them and go back to Despot for your reward.
+ * <li> Mrotho asking you to kill 100 blordrough warriors.
+ * <li>
+ * <li> Kill them and go back to Mrotho for your reward.
  * </ul>
  *
  *
@@ -61,7 +63,7 @@ import games.stendhal.server.util.TimeUtil;
 
  public class KillBlordroughs extends AbstractQuest {
 
-	private static final String QUEST_NPC = "Despot Halb Errvl";
+	private static final String QUEST_NPC = "Mrotho";
 	private static final String QUEST_SLOT = "kill_blordroughs";
 	private final long questdelay = MathHelper.MILLISECONDS_IN_ONE_WEEK;
 	protected final int killsnumber = 100;
@@ -260,7 +262,7 @@ import games.stendhal.server.util.TimeUtil;
 
 				if(killed==0) {
 					// player killed no creatures but asked about quest again.
-					npc.say("I already explained to you what i need. Are you an idiot, as you cant remember this simple thing about #blordroughs?");
+					npc.say("You have to kill #blordroughs, remember?");
 					return;
 				}
 				if(killed < killsnumber) {
@@ -270,7 +272,7 @@ import games.stendhal.server.util.TimeUtil;
 				}
 				if(killed == killsnumber) {
 					// player killed no more no less then needed soldiers
-					npc.say("Good work! Take this moneys. And if you will need assassin job again, ask me in one week. I think they will try to fight me again.");
+					npc.say("Good work! Take this moneys. And if you will need assassin job again, ask me in one week. I think they will try to fight our army again.");
 				} else {
 					// player killed more then needed soldiers
 					npc.say("Pretty good! You killed "+(killed-killsnumber)+" extra "+
@@ -281,7 +283,7 @@ import games.stendhal.server.util.TimeUtil;
 				final Long currtime = System.currentTimeMillis();
 				if (questCanBeGiven(player, currtime)) {
 					// will give quest to player.
-					npc.say("I need help in battles with #Blordrough warriors. They really annoying me. Kill at least 100 of any blordrough soldiers and i will reward you.");
+					npc.say("Ados army need help in battles with #Blordrough warriors. They really annoying us. Kill at least 100 of any blordrough warriors and you will get reward.");
 					writeQuestRecord(player);
 				} else {
 					npc.say(getNPCTextReply(player, currtime));
@@ -294,15 +296,36 @@ import games.stendhal.server.util.TimeUtil;
 	 * add quest state to npc's fsm.
 	 */
 	private void step_1() {
+		npc.add(ConversationStates.IDLE,
+				ConversationPhrases.GREETING_MESSAGES,
+				new GreetingMatchesNameCondition(npc.getName()),
+				false,
+				ConversationStates.ATTENDING,
+				"Greetings. Have you come to enlist as a soldier?",
+				null);
+		npc.add(ConversationStates.ATTENDING,
+				ConversationPhrases.YES_MESSAGES,
+				new GreetingMatchesNameCondition(npc.getName()),
+				false,
+				ConversationStates.ATTENDING,
+				"Huh! Well, I would give you a #quest then...",
+				null);
+		npc.add(ConversationStates.ATTENDING,
+				ConversationPhrases.NO_MESSAGES,
+				new GreetingMatchesNameCondition(npc.getName()),
+				false,
+				ConversationStates.ATTENDING,
+				"Good! You wouldn't have fit in here anyway. Perhaps you want to #offer some of that armor instead...",
+				null);
 		npc.add(ConversationStates.ATTENDING,
 				Arrays.asList("Blordrough","blordrough","blordroughs"),
 				null,
 				ConversationStates.ATTENDING,
-				"My Mithrilbourgh army have great losses in battles with Blordrough soldiers. They coming from side of Ados tunnels.",
+				"Ados army have great losses in battles with Blordrough soldiers. They coming from side of Ados tunnels.",
 				null);
 		npc.add(ConversationStates.ATTENDING,
 				ConversationPhrases.QUEST_MESSAGES,
-				null,
+				new GreetingMatchesNameCondition(npc.getName()),
 				ConversationStates.ATTENDING,
 				null,
 				new QuestAction());
@@ -316,15 +339,26 @@ import games.stendhal.server.util.TimeUtil;
 		npc = npcs.get(QUEST_NPC);
 		fillQuestInfo(
 				"Kill Blordroughs",
-				"Despot Halb Errvl wants some Blordrough warriors killed.",
+				"Mrotho wants some Blordrough warriors killed.",
 				true);
 		step_1();
 	}
 
 	@Override
 	public List<String> getHistory(final Player player) {
-		// not currently an active quest
-		return new ArrayList<String>();
+		final List<String> res = new ArrayList<String>();
+		if (!player.hasQuest(QUEST_SLOT)) {
+				return res;
+		}
+		res.add("I have met Mrotho in Ados barracks.");
+		final String questState = player.getQuest(QUEST_SLOT);
+		if (questState.contains("done")) {
+			res.add("I killed blordroughs and get reward from "+QUEST_NPC);
+			return res;
+		} else {
+			res.add("I killed "+Integer.toString(getKilledCreaturesNumber(player))+" blordroughs (need "+Integer.toString(killsnumber)+ ").");
+		}
+        return res;
 	}
 
 	/**
@@ -345,7 +379,6 @@ import games.stendhal.server.util.TimeUtil;
 
 	@Override
 	public String getNPCName() {
-		return "Despot Halb Errvl";
+		return "Mrotho";
 	}
 }
-

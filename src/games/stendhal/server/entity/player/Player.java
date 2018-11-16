@@ -42,7 +42,6 @@ import games.stendhal.common.TradeState;
 import games.stendhal.common.Version;
 import games.stendhal.common.constants.Nature;
 import games.stendhal.common.constants.SoundLayer;
-import games.stendhal.common.constants.Testing;
 import games.stendhal.common.grammar.Grammar;
 import games.stendhal.common.parser.WordList;
 import games.stendhal.server.core.engine.GameEvent;
@@ -67,8 +66,10 @@ import games.stendhal.server.entity.item.RingOfLife;
 import games.stendhal.server.entity.npc.behaviour.impl.OutfitChangerBehaviour.ExpireOutfit;
 import games.stendhal.server.entity.slot.Slots;
 import games.stendhal.server.entity.status.StatusType;
+import games.stendhal.server.events.HeadlessPrivateTextEvent;
 import games.stendhal.server.events.PrivateTextEvent;
 import games.stendhal.server.events.SoundEvent;
+import marauroa.common.game.RPEvent;
 import marauroa.common.game.RPObject;
 import marauroa.common.game.RPSlot;
 import marauroa.common.game.SyntaxException;
@@ -181,11 +182,8 @@ public class Player extends RPEntity implements UseListener {
 		player.put("atk_xp", 0);
 		player.put("def", 10);
 		player.put("def_xp", 0);
-		/* TODO: Remove condition after ranged stat testing is finished. */
-		if (Testing.COMBAT) {
-			player.put("ratk", 10);
-			player.put("ratk_xp", 0);
-		}
+		player.put("ratk", 10);
+		player.put("ratk_xp", 0);
 		player.put("level", 0);
 		player.setXP(0);
 
@@ -276,37 +274,6 @@ public class Player extends RPEntity implements UseListener {
 		}
 
 		unlockedPortals = new LinkedList<Integer>();
-
-		/* TODO: Remove condition when ranged stat testing is finished. */
-		if (Testing.COMBAT) {
-			/*
-			 * TODO: Remove if VOLATILE definition is removed from "ratk" and
-			 * "ratk_xp" attributes.
-			 */
-			if (!this.has("ratk_xp")) {
-				/*
-				 * If an existing character does not have ranged stat set it at
-				 * same level and experience as new character.
-				 */
-				this.put("ratk", 10);
-				this.put("ratk_xp", 0);
-
-				/*
-				 * if player's current level is 20 or higher give a buffer based
-				 * on about 25% of current atk experience.
-				 */
-				if (this.getLevel() > 19) {
-					/*
-					 * Using setRatkXPinternal() instead of setRatkXP() here to
-					 * avoid multiple calls to updateModifiedAttributes().
-					 */
-					// FIXME: Is this formula accurate?
-					this.setRatkXPInternal((int) (this.getAtkXP() * 0.0026),
-							false);
-				}
-			}
-		}
-
 		updateModifiedAttributes();
 	}
 
@@ -415,6 +382,15 @@ public class Player extends RPEntity implements UseListener {
 			directions.clear();
 			super.stop();
 		}
+	}
+
+	/**
+	 * Forces player to stop moving, bypassing auto-walk
+	 */
+	public void forceStop() {
+		this.remove(AUTOWALK);
+		directions.clear();
+		super.stop();
 	}
 
 	/**
@@ -1016,7 +992,7 @@ public class Player extends RPEntity implements UseListener {
 	 */
 	@Override
 	public void sendPrivateText(final String text) {
-		sendPrivateText(getServerNotificationType(clientVersion), text);
+		sendPrivateText(text, false);
 	}
 
 	/**
@@ -1029,7 +1005,41 @@ public class Player extends RPEntity implements UseListener {
 	 */
 	@Override
 	public void sendPrivateText(final NotificationType type, final String text) {
-		this.addEvent(new PrivateTextEvent(type, text));
+		sendPrivateText(type, text, false);
+	}
+
+	/**
+	 * Sends a message that only this entity can read.
+	 *
+	 * @param text
+	 * 			The message.
+	 * @param headless
+	 * 			If <code>true</code>, does not draw a chat balloon on canvas.
+	 */
+	@Override
+	public void sendPrivateText(final String text, final boolean headless) {
+		sendPrivateText(getServerNotificationType(clientVersion), text, headless);
+	}
+
+	/**
+	 * Sends a message that only this entity can read.
+	 *
+	 * @param type
+	 * 			NotificationType
+	 * @param text
+	 * 			The message.
+	 * @param headless
+	 * 			If <code>true</code>, does not draw a chat balloon on canvas.
+	 */
+	@Override
+	public void sendPrivateText(final NotificationType type, final String text, final boolean headless) {
+		RPEvent event;
+		if (headless) {
+			event = new HeadlessPrivateTextEvent(type, text);
+		} else {
+			event = new PrivateTextEvent(type, text);
+		}
+		this.addEvent(event);
 		this.notifyWorldAboutChanges();
 	}
 
@@ -1477,6 +1487,26 @@ public class Player extends RPEntity implements UseListener {
 	}
 
 	/**
+	 * Changes solo kills count to specified value.
+	 *
+	 * @param name name of killed entity
+	 * @param count value to set
+	 */
+	public void setSoloKillCount(final String name, final int count) {
+		killRec.setSoloKillCount(name, count);
+	}
+
+	/**
+	 * Changes shared kills count to specified value.
+	 *
+	 * @param name name of killed entity
+	 * @param count value to set
+	 */
+	public void setSharedKillCount(final String name, final int count) {
+		killRec.setSharedKillCount(name, count);
+	}
+
+	/**
 	 * Returns how much the player has killed 'name' solo.
 	 *
 	 * @param name
@@ -1556,7 +1586,7 @@ public class Player extends RPEntity implements UseListener {
 	 *            The player who initiated the teleporting, or null if no player
 	 *            is responsible. This is only to give feedback if something
 	 *            goes wrong. If no feedback is wanted, use null.
-	 * @return true iff teleporting was successful
+	 * @return <code>true</code> if teleporting was successful.
 	 */
 	public boolean teleport(final StendhalRPZone zone, final int x,
 			final int y, final Direction dir, final Player teleporter) {
@@ -1575,7 +1605,28 @@ public class Player extends RPEntity implements UseListener {
 			}
 			return false;
 		}
+	}
 
+	/**
+	 * Teleports player to given destination using zoneid string.
+	 *
+	 * @param zoneid
+	 * 		<code>String</code> name/ID of zone.
+	 * @param x
+	 * 		Destination's horizontal coordinate.
+	 * @param y
+	 * 		Distination's vertical coordinate.
+	 * @param dir
+	 * 		The direction in which the player should look after
+	 * 		teleporting, or null if the direction shouldn't change.
+	 * @param teleporter
+	 * @return
+	 * 		<code>true</code> if teleporting was successful.
+	 */
+	public boolean teleport(final String zoneid, final int x,
+			final int y, final Direction dir, final Player teleporter) {
+		final StendhalRPZone zone = SingletonRepository.getRPWorld().getZone(zoneid);
+		return teleport(zone, x, y, dir, teleporter);
 	}
 
 	/**
@@ -1657,6 +1708,29 @@ public class Player extends RPEntity implements UseListener {
 		final Outfit newOutfit = outfit.putOver(getOutfit());
 		put("outfit", newOutfit.getCode());
 		notifyWorldAboutChanges();
+	}
+
+	// Hack to preserve detail layer
+	public void setOutfitWithDetail(final Outfit outfit) {
+		setOutfitWithDetail(outfit, false);
+	}
+
+	// Hack to preserve detail layer
+	public void setOutfitWithDetail(final Outfit outfit, final boolean temporary) {
+		// preserve detail layer
+		final int detailCode = getOutfit().getCode() / 100000000;
+
+		// set the new outfit
+		setOutfit(outfit, temporary);
+
+		if (detailCode > 0) {
+			// get current outfit code
+			final int outfitCode = outfit.getCode() + (detailCode * 100000000);
+
+			// re-add detail
+			put("outfit", outfitCode);
+			notifyWorldAboutChanges();
+		}
 	}
 
 	public Outfit getOriginalOutfit() {
@@ -2567,6 +2641,17 @@ public class Player extends RPEntity implements UseListener {
 	 */
 	public int getRequiredItemQuantity(String questname, int index) {
 		return quests.getRequiredItemQuantity(questname, index);
+	}
+
+	@Override
+	protected void handleLeaveZone(int nx, final int ny) {
+		// Players using continuous movement should stop if they cross
+		// the zone border when using mouse for movement
+		boolean stopAfter = hasPath();
+		super.handleLeaveZone(nx, ny);
+		if (stopAfter) {
+			stop();
+		}
 	}
 
 	/**

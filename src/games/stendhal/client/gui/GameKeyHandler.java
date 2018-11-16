@@ -11,23 +11,28 @@
  ***************************************************************************/
 package games.stendhal.client.gui;
 
+import static games.stendhal.client.gui.settings.SettingsProperties.DOUBLE_TAP_AUTOWALK_PROPERTY;
 import static games.stendhal.common.constants.Actions.AUTOWALK;
 import static games.stendhal.common.constants.Actions.DIR;
 import static games.stendhal.common.constants.Actions.FACE;
 import static games.stendhal.common.constants.Actions.MODE;
 import static games.stendhal.common.constants.Actions.TYPE;
 import static games.stendhal.common.constants.Actions.WALK;
+import static games.stendhal.common.constants.General.PATHSET;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 
 import games.stendhal.client.GameScreen;
 import games.stendhal.client.StendhalClient;
 import games.stendhal.client.entity.IEntity;
 import games.stendhal.client.entity.User;
 import games.stendhal.client.gui.j2d.entity.EntityView;
+import games.stendhal.client.gui.wt.core.WtWindowManager;
 import games.stendhal.common.Direction;
 import marauroa.common.game.RPAction;
+import marauroa.common.game.RPObject;
 
 /**
  * Main window keyboard handling.
@@ -36,6 +41,13 @@ class GameKeyHandler implements KeyListener {
 	private final StendhalClient client;
 	private final GameScreen screen;
 	private long lastAction = 0;
+
+	/**
+	 * Double key presses.
+	 */
+	private final int doublePressThreshold = 300;
+	private int prevKeyPress = -1;
+	private long doublePressStart = -1;
 
 	/**
 	 * Delayed direction release holder.
@@ -56,6 +68,7 @@ class GameKeyHandler implements KeyListener {
 	@Override
 	public void keyPressed(final KeyEvent e) {
 		final int keyCode = e.getKeyCode();
+		final boolean doublePress = isDoublePress(keyCode);
 
 		/* Ignore if the key is already pressed down. */
 		if (!client.keyIsPressed(keyCode)) {
@@ -93,14 +106,13 @@ class GameKeyHandler implements KeyListener {
 				 */
 				final Direction direction = keyCodeToDirection(e.getKeyCode());
 
-				/* TODO: Remove MOTION condition when auto-walk testing is
-				 * finished.
-				 *
-				 * Check if the player is currently using auto-walk or the Alt
+				/* Check if the player is currently using auto-walk or the Alt
 				 * key is pressed.
 				 */
 				User user = User.get();
-				if ((user.getRPObject().has(AUTOWALK) || e.isAltDown())) {
+				if ((user.getRPObject().has(AUTOWALK) ||
+						("true".equals(WtWindowManager.getInstance().getProperty(DOUBLE_TAP_AUTOWALK_PROPERTY, "false"))
+						&& doublePress))) {
 					/* Face direction pressed and toggle auto-walk. */
 					this.processAutoWalk(direction, user);
 				} else {
@@ -170,6 +182,30 @@ class GameKeyHandler implements KeyListener {
 	@Override
 	public void keyTyped(final KeyEvent e) {
 		// Ignore. All the work is done in keyPressed and keyReleased methods.
+	}
+
+	/**
+	 * Checks if user hits same key twice within double press threshold.
+	 *
+	 * FIXME: Delayed direction release seems to interfere sometimes.
+	 *
+	 * @param keyCode Key to check for double press
+	 * @return <code>true</code> if same key is pressed a second time within threshold limit
+	 */
+	public boolean isDoublePress(final int keyCode) {
+		if (!(doublePressStart < 0)) {
+			if (keyCode == prevKeyPress && (System.currentTimeMillis() - doublePressStart) < doublePressThreshold) {
+				// Reset key press values
+				prevKeyPress = -1;
+				doublePressStart = -1;
+
+				return true;
+			}
+		}
+
+		prevKeyPress = keyCode;
+		doublePressStart = System.currentTimeMillis();
+		return false;
 	}
 
 	/**
@@ -307,6 +343,30 @@ class GameKeyHandler implements KeyListener {
 		}
 
 		directionRelease = new DelayedDirectionRelease(direction, facing);
+	}
+
+	/**
+	 * Flushes player direction states & direction keys in pressed state.
+	 */
+	public void flushDirectionKeys() {
+		final RPObject player = client.getPlayer();
+
+		// Flush direction states only if player does not have path & is not using auto-walk.
+		if (!player.has(AUTOWALK) && !player.has(PATHSET)) {
+			// If player is moving when client loses focus, direction must be flushed. Otherwise user will
+			// will have to press the direction key (of the direction character was facing when client
+			// lost focus) in order to resume movement.
+			for (Direction dir : Arrays.asList(Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN)) {
+				client.removeDirection(dir, false);
+			}
+		}
+
+		// Flush direction keys in pressed state.
+		for (final Integer keyCode : Arrays.asList(KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, KeyEvent.VK_UP, KeyEvent.VK_DOWN)) {
+			if (client.keyIsPressed(keyCode)) {
+				client.onKeyReleased(keyCode);
+			}
+		}
 	}
 
 	/**

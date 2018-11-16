@@ -209,6 +209,9 @@ public class Item extends PassiveEntity implements TurnListener, EquipListener,
 		// Items that protect against poisoning
 		entity.addAttribute("antipoison", Type.FLOAT, (byte) (Definition.HIDDEN | Definition.VOLATILE));
 
+		// Consumable items the heas status effects
+		entity.addAttribute("immunization", Type.STRING, (byte) (Definition.HIDDEN | Definition.VOLATILE));
+
 		// Some items are quest rewards that other players
 		// don't deserve. Not hidden because the client uses it for an anti
 		// theft hack
@@ -235,6 +238,9 @@ public class Item extends PassiveEntity implements TurnListener, EquipListener,
 
 		// True for items that should be bound automatically at loot (or login)
 		entity.addAttribute("autobind", Type.FLAG, (byte) (Definition.HIDDEN | Definition.VOLATILE));
+
+		// Number of uses for BreakableItem
+		entity.addAttribute("uses", Type.INT);
 	}
 
 
@@ -323,6 +329,30 @@ public class Item extends PassiveEntity implements TurnListener, EquipListener,
 			return getInt("rate");
 		}
 
+		return DEFAULT_ATTACK_RATE;
+	}
+
+	/**
+	 * Returns turn delay for this item's attack.
+	 *
+	 * @param meleeDistance
+	 * 		<code>true</code> if the entity is standing next to its attack target.
+	 * @return
+	 * 		Turn delay for this items attack.
+	 */
+	public int getAttackRate(final boolean meleeDistance) {
+		// range weapons should not use modified attack rate for melee attacks
+		if (meleeDistance && has("range")) {
+			return DEFAULT_ATTACK_RATE;
+		}
+
+		return getAttackRate();
+	}
+
+	/**
+	 * Retrieves default attack rate for items.
+	 */
+	public static int getDefaultAttackRate() {
 		return DEFAULT_ATTACK_RATE;
 	}
 

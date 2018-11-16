@@ -17,12 +17,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import games.stendhal.common.Direction;
+import games.stendhal.common.constants.Occasion;
 import games.stendhal.common.grammar.ItemParserResult;
 import games.stendhal.server.core.config.ZoneConfigurator;
 import games.stendhal.server.core.engine.StendhalRPZone;
 import games.stendhal.server.core.pathfinder.FixedPath;
 import games.stendhal.server.core.pathfinder.Node;
 import games.stendhal.server.entity.Outfit;
+import games.stendhal.server.entity.RPEntity;
 import games.stendhal.server.entity.npc.ConversationPhrases;
 import games.stendhal.server.entity.npc.ConversationStates;
 import games.stendhal.server.entity.npc.EventRaiser;
@@ -42,6 +45,9 @@ public class OutfitLenderNPC implements ZoneConfigurator {
 	private static final double N = 1;
 
 	private static HashMap<String, Pair<Outfit, Boolean>> outfitTypes = new HashMap<String, Pair<Outfit, Boolean>>();
+
+	private String jobReply;
+
 	/**
 	 * Configure a zone.
 	 *
@@ -50,6 +56,12 @@ public class OutfitLenderNPC implements ZoneConfigurator {
 	 */
 	@Override
 	public void configureZone(final StendhalRPZone zone, final Map<String, String> attributes) {
+		if (Occasion.MINETOWN) {
+			jobReply = "I work in clothes boutique located in Magic City. It's no ordinary shop, we use magic to put our clients into fantastic outfits. Ask about the #offer.";
+		} else {
+			jobReply= "I work in this clothes boutique. It's no ordinary shop, we use magic to put our clients into fantastic outfits. Ask about the #offer.";
+		}
+
 		initOutfits();
 		buildBoutiqueArea(zone);
 	}
@@ -59,39 +71,35 @@ public class OutfitLenderNPC implements ZoneConfigurator {
 		// (what's null doesn't change that part of the outfit)
 		// so true means we put on over
 		// FIXME: Use new outfit system
-		  final Pair<Outfit, Boolean> JUMPSUIT = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(83), null), true);
-		  final Pair<Outfit, Boolean> DUNGAREES = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(84), null), true);
-		  final Pair<Outfit, Boolean> GREEN_DRESS = new Pair<Outfit, Boolean>(new Outfit(null, null, null,	Integer.valueOf(78), null), true);
+		final Pair<Outfit, Boolean> JUMPSUIT = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(83), null), true);
+		final Pair<Outfit, Boolean> DUNGAREES = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(84), null), true);
+		final Pair<Outfit, Boolean> GREEN_DRESS = new Pair<Outfit, Boolean>(new Outfit(null, null, null,	Integer.valueOf(78), null), true);
 
-		  final Pair<Outfit, Boolean> GOWN = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(82), null), true);
-		  final Pair<Outfit, Boolean> NOOB = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(80), null), true);
-		  final Pair<Outfit, Boolean> GLASSES = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(99), null, null), true);
-		  final Pair<Outfit, Boolean> GLASSES_2 = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(79), null, null), true);
-		  final Pair<Outfit, Boolean> HAT = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(99), null, null, null), true);
+		final Pair<Outfit, Boolean> GOWN = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(82), null), true);
+		final Pair<Outfit, Boolean> NOOB = new Pair<Outfit, Boolean>(new Outfit(null, null, null, Integer.valueOf(80), null), true);
+		final Pair<Outfit, Boolean> GLASSES = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(99), null, null), true);
+		final Pair<Outfit, Boolean> GLASSES_2 = new Pair<Outfit, Boolean>(new Outfit(null, null, Integer.valueOf(79), null, null), true);
+		final Pair<Outfit, Boolean> HAT = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(99), null, null, null), true);
 
 		// these outfits must replace the current outfit (what's null simply isn't there)
-		  final Pair<Outfit, Boolean> BUNNY = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(81), Integer.valueOf(98)), false);
-		  final Pair<Outfit, Boolean> HORSE = new Pair<Outfit, Boolean>(new Outfit(0, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(97)), false);
-		  final Pair<Outfit, Boolean> GIRL_HORSE = new Pair<Outfit, Boolean>(new Outfit(0, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(96)), false);
-		  final Pair<Outfit, Boolean> ALIEN = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(95)), false);
+		final Pair<Outfit, Boolean> BUNNY = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(81), Integer.valueOf(98)), false);
+		final Pair<Outfit, Boolean> HORSE = new Pair<Outfit, Boolean>(new Outfit(0, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(97)), false);
+		final Pair<Outfit, Boolean> GIRL_HORSE = new Pair<Outfit, Boolean>(new Outfit(0, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(96)), false);
+		final Pair<Outfit, Boolean> ALIEN = new Pair<Outfit, Boolean>(new Outfit(null, Integer.valueOf(00), Integer.valueOf(98), Integer.valueOf(00), Integer.valueOf(95)), false);
 
-
-
-			outfitTypes.put("jumpsuit", JUMPSUIT);
-			outfitTypes.put("dungarees", DUNGAREES);
-			outfitTypes.put("green dress", GREEN_DRESS);
-			outfitTypes.put("gown", GOWN);
-			outfitTypes.put("orange", NOOB);
-			outfitTypes.put("bunny suit", BUNNY);
-			outfitTypes.put("glasses", GLASSES);
-			outfitTypes.put("other glasses", GLASSES_2);
-			outfitTypes.put("hat", HAT);
-			outfitTypes.put("horse", HORSE);
-			outfitTypes.put("girl horse", GIRL_HORSE);
-			outfitTypes.put("alien", ALIEN);
+		outfitTypes.put("jumpsuit", JUMPSUIT);
+		outfitTypes.put("dungarees", DUNGAREES);
+		outfitTypes.put("green dress", GREEN_DRESS);
+		outfitTypes.put("gown", GOWN);
+		outfitTypes.put("orange", NOOB);
+		outfitTypes.put("bunny suit", BUNNY);
+		outfitTypes.put("glasses", GLASSES);
+		outfitTypes.put("other glasses", GLASSES_2);
+		outfitTypes.put("hat", HAT);
+		outfitTypes.put("horse", HORSE);
+		outfitTypes.put("girl horse", GIRL_HORSE);
+		outfitTypes.put("alien", ALIEN);
 	}
-
-
 
 	private void buildBoutiqueArea(final StendhalRPZone zone) {
 		final SpeakerNPC npc = new SpeakerNPC("Liliana") {
@@ -187,22 +195,36 @@ public class OutfitLenderNPC implements ZoneConfigurator {
 					null,
 					ConversationStates.ATTENDING,
 					"Just tell me if you want to #hire a #gown, #hire a #green #dress, #hire #glasses, #hire #other #glasses, #hire a #hat, #hire an #alien suit, #hire a #horse outfit, #hire a #girl #horse outfit, #hire a #jumpsuit, #hire #dungarees, #hire a #bunny #suit or #hire an #orange outfit.",
-					new ExamineChatAction("outfits.png", "Outfits", "Price varies"));
-				addJob("I work in this clothes boutique. It's no ordinary shop, we use magic to put our clients into fantastic outfits. Ask about the #offer.");
+					new ExamineChatAction("outfits1.png", "Outfits", "Price varies"));
+				addJob(jobReply);
 				// addJob("I normally work in a clothes boutique, we use magic to put our clients into fantastic outfits. I'm here for Mine Town Revival Weeks, where we #offer our outfits at greatly reduced prices, but they last for less time!");
 				addHelp("Our hired outfits wear off after some time, but you can always come back for more!");
 				addGoodbye("Bye!");
 				final OutfitChangerBehaviour behaviour = new SpecialOutfitChangerBehaviour(priceList, endurance, "Your magical outfit has worn off.");
 				new OutfitChangerAdder().addOutfitChanger(this, behaviour, "hire", false, false);
 			}
+
+			@Override
+			protected void onGoodbye(RPEntity player) {
+				if (Occasion.MINETOWN) {
+					setDirection(Direction.DOWN);
+				}
+			}
 		};
 
-		npc.setEntityClass("noimagenpc"); /* slim_woman_npc */
-		npc.setPosition(16, 5);
-		// npc.setPosition(101, 102);
+		npc.setEntityClass("slim_woman_npc");
 		npc.initHP(100);
 		npc.setDescription("You see Liliana. She works in the Magic City clothes boutique.");
+
+		if (Occasion.MINETOWN) {
+			npc.clearPath();
+			npc.stop();
+			npc.setDirection(Direction.DOWN);
+			npc.setPosition(53, 9);
+		} else {
+			npc.setPosition(16, 5);
+		}
+
 		zone.add(npc);
 	}
 }
-

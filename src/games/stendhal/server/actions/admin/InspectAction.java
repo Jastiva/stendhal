@@ -78,6 +78,8 @@ public class InspectAction extends AdministrationAction {
 			st.append("\nID: " + action.get("target") + " in " + inspected.getZone().getName() + " at (" + + inspected.getX() + ", " + + inspected.getY()+")");
 			st.append("\nATK:    " + inspected.getAtk() + "("
 					+ inspected.getAtkXP() + ")");
+			st.append("\nRATK:  " + inspected.getRatk() + "("
+					+ inspected.getRatkXP() + ")");
 			st.append("\nDEF:    " + inspected.getDef() + "("
 					+ inspected.getDefXP() + ")");
 			st.append("\nHP:     " + inspected.getHP() + " / "
@@ -87,6 +89,11 @@ public class InspectAction extends AdministrationAction {
 			st.append("\nKarma:  " + inspected.getKarma());
 			st.append("\nMana:  " + inspected.getMana() + " / "
 					+ inspected.getBaseMana());
+			if (inspected.has("outfit")) {
+				st.append("\nOutfit: " + inspected.get("outfit"));
+			} else if (inspected.has("class")) {
+				st.append("\nOutfit: " + inspected.get("class"));
+			}
 			st.append("\nequips");
 
 			for (final RPSlot slot : inspected.slots()) {
@@ -139,7 +146,7 @@ public class InspectAction extends AdministrationAction {
 			st.append(target.toString());
 		}
 
-		player.sendPrivateText(st.toString());
+		player.sendPrivateText(st.toString(), true);
 	}
 
 }

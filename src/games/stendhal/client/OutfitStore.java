@@ -32,28 +32,21 @@ public class OutfitStore {
 	private Logger logger = Logger.getLogger(OutfitStore.class);
 
 	/** outfit directory */
-	final String outfits = "data/sprites/outfit";
-
+	private static final String OUTFITS = "data/sprites/outfit";
 	/** body directory */
-	final String bodies = outfits + "/body";
-
+	private static final String BODIES = OUTFITS + "/body";
 	/** dress directory */
-	final String dresses = outfits + "/dress";
-
+	private static final String DRESSES = OUTFITS + "/dress";
 	/** head directory */
-	final String heads = outfits + "/head";
-
+	private static final String HEADS = OUTFITS + "/head";
 	/** mouth directory */
-	final String mouths = outfits + "/mouth";
-
+	private static final String MOUTHS = OUTFITS + "/mouth";
 	/** eyes directory */
-	final String eyes = outfits + "/eyes";
-
+	private static final String EYES = OUTFITS + "/eyes";
 	/** hair directory */
-	final String hairs = outfits + "/hair";
-
+	private static final String HAIRS = OUTFITS + "/hair";
 	/** detail directory */
-	final String details = outfits + "/detail";
+	private static final String DETAILS = OUTFITS + "/detail";
 
 	/**
 	 * The singleton.
@@ -139,42 +132,6 @@ public class OutfitStore {
 	}
 
 	/**
-	 * Build an outfit sprite.
-	 *
-	 * Calls buildOutfit(primaryCode, color) to build primary features then
-	 * adds extended features: mouth and eyes.
-	 *
-	 * @param code
-	 * 		The extended code used for mouth and eyes
-	 * @param color
-	 * 		Coloring data
-	 * @return
-	 * 		A walking state sprite
-	 */
-	private Sprite buildOutfit(long code, final OutfitColor color) {
-		int oldcode = (int) (code / (10000));
-		Sprite layer = this.buildOutfit(oldcode, color);
-
-		final int mouthcode = (int) (code % 100);
-		code /= 100;
-
-		final int eyescode = (int) (code % 100);
-
-		final ImageSprite sprite = new ImageSprite(layer);
-		final Graphics g = sprite.getGraphics();
-
-		// Mouth layer
-		layer = getMouthSprite(mouthcode);
-		layer.draw(g, 0, 0);
-
-		// Eyes layer
-		layer = getEyesSprite(eyescode, color);
-		layer.draw(g, 0, 0);
-
-		return sprite;
-	}
-
-	/**
 	 * Get the shared instance.
 	 *
 	 * @return The shared [singleton] instance.
@@ -221,7 +178,7 @@ public class OutfitStore {
 	public Sprite getBodySprite(final int index, OutfitColor color) {
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = bodies + "/body_" + suffix + ".png";
+		final String ref = BODIES + "/body_" + suffix + ".png";
 
 		if (!store.existsSprite(ref)) {
 			return null;
@@ -246,7 +203,7 @@ public class OutfitStore {
 
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = dresses + "/dress_" + suffix + ".png";
+		final String ref = DRESSES + "/dress_" + suffix + ".png";
 
 		return store.getColoredSprite(ref, color.getColor(OutfitColor.DRESS));
 	}
@@ -290,7 +247,7 @@ public class OutfitStore {
 
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = hairs + "/hair_" + suffix + ".png";
+		final String ref = HAIRS + "/hair_" + suffix + ".png";
 
 		return store.getColoredSprite(ref, color.getColor(OutfitColor.HAIR));
 	}
@@ -306,7 +263,7 @@ public class OutfitStore {
 	public Sprite getEyesSprite(final int index, OutfitColor color) {
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = eyes + "/eyes_" + suffix + ".png";
+		final String ref = EYES + "/eyes_" + suffix + ".png";
 
 		if (!store.existsSprite(ref)) {
 			return null;
@@ -325,7 +282,7 @@ public class OutfitStore {
 	public Sprite getMouthSprite(final int index) {
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = mouths + "/mouth_" + suffix + ".png";
+		final String ref = MOUTHS + "/mouth_" + suffix + ".png";
 
 		if (!store.existsSprite(ref)) {
 			return null;
@@ -346,7 +303,7 @@ public class OutfitStore {
 	public Sprite getHeadSprite(final int index, OutfitColor color) {
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = heads + "/head_" + suffix + ".png";
+		final String ref = HEADS + "/head_" + suffix + ".png";
 
 		if (!store.existsSprite(ref)) {
 			return null;
@@ -371,7 +328,7 @@ public class OutfitStore {
 
 		final String suffix = getSpriteSuffix(index);
 
-		final String ref = details + "/detail_" + suffix + ".png";
+		final String ref = DETAILS + "/detail_" + suffix + ".png";
 
 		return store.getColoredSprite(ref, color.getColor(OutfitColor.DETAIL));
 	}
@@ -397,23 +354,6 @@ public class OutfitStore {
 	}
 
 	/**
-	 * Get an outfit sprite with extended features.
-	 *
-	 * @param code
-	 * 		14-digit integer representing extended outfit features: mouth and
-	 * 		eyes
-	 * @param color
-	 * 		Color information for outfit parts
-	 * @return
-	 * 		A walking state sprite
-	 */
-	private Sprite getOutfit(final long code, final OutfitColor color) {
-		final String reference = buildReference(code,
-				color.toString());
-		return getOutfit(code, color, reference);
-	}
-
-	/**
 	 * Get outfit for a known outfit reference.
 	 *
 	 * @param code outfit code
@@ -423,32 +363,6 @@ public class OutfitStore {
 	 */
 	private Sprite getOutfit(final int code, final OutfitColor color,
 			final String reference) {
-		final SpriteCache cache = SpriteCache.get();
-		Sprite sprite = cache.get(reference);
-
-		if (sprite == null) {
-			sprite = buildOutfit(code, color);
-			cache.add(reference, sprite);
-		}
-
-		return sprite;
-	}
-
-	/**
-	 * Get outfit for a knows outfit reference with extended outfit parts:
-	 * mouth and eyes.
-	 *
-	 * @param code
-	 * 		The extended outfit system code (mouth and eyes)
-	 * @param color
-	 * 		Color information for outfit parts
-	 * @param reference
-	 * 		Outfit reference
-	 * @return
-	 * 		Outfit
-	 */
-	private Sprite getOutfit(final long code,
-			final OutfitColor color, final String reference) {
 		final SpriteCache cache = SpriteCache.get();
 		Sprite sprite = cache.get(reference);
 
@@ -481,43 +395,6 @@ public class OutfitStore {
 			Sprite sprite = cache.get(fullRef);
 			if (sprite == null) {
 				Sprite plain = getOutfit(code, color);
-				SpriteStore store = SpriteStore.get();
-				sprite = store.modifySprite(plain, adjColor, blend, fullRef);
-
-			}
-			return sprite;
-		}
-	}
-
-	/**
-	 * Get an extended feature outfit with color adjustment, such as a player
-	 * in colored light.
-	 *
-	 * @param code
-	 * 		14-digit integer representing the outfit
-	 * @param color
-	 * 		Color information for outfit parts
-	 * @param adjColor
-	 * 		Adjustment color for the entire outfit
-	 * @param blend
-	 * 		Blend mode for applying the adjustment color
-	 * @return
-	 * 		Color adjusted outfit
-	 */
-	public Sprite getAdjustedOutfit(final long code, final OutfitColor color,
-			final Color adjColor, final Composite blend) {
-		if ((adjColor == null) || (blend == null)) {
-			return getOutfit(code, color);
-		} else {
-			final SpriteCache cache = SpriteCache.get();
-			// Use the normalized string for the reference
-			final String reference = buildReference(code,
-					color.toString());
-			String fullRef = reference + ":" + adjColor.getRGB() + blend.toString();
-			Sprite sprite = cache.get(fullRef);
-			if (sprite == null) {
-				Sprite plain = getOutfit(code, color);
-				SpriteStore store = SpriteStore.get();
 				sprite = store.modifySprite(plain, adjColor, blend, fullRef);
 
 			}
@@ -534,20 +411,5 @@ public class OutfitStore {
 	 */
 	private String buildReference(final int code, final String colorCode) {
 		return "OUTFIT:" + code + "@" + colorCode;
-	}
-
-	/**
-	 * Create a unique reference for an outfit that uses extended features:
-	 * Currently mouth and eyes.
-	 *
-	 * @param code
-	 * 		14-digit integer representing outfit
-	 * @param colorCode
-	 * 		Coloring information for outfit parts
-	 * @return
-	 * 		Outfit reference
-	 */
-	private String buildReference(final long code, final String colorCode) {
-		return "OUTFIT:" + Long.toString(code) + "@" + colorCode;
 	}
 }

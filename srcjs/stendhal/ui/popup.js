@@ -4,7 +4,7 @@
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Affero General Public License as        *
- *   published by the Free Software Foundation; either version 3 of the    * 
+ *   published by the Free Software Foundation; either version 3 of the    *
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
@@ -30,7 +30,7 @@ stendhal.ui.Popup = function(title, content, x, y) {
 	};
 
 	function createTitleHtml() {
-		return "<div class='popuptitle'><div class='popuptitleclose'>X</div>" + stendhal.ui.html.esc(title) + "</div>";
+		return "<div class='popuptitle background'><div class='popuptitleclose'>X</div>" + stendhal.ui.html.esc(title) + "</div>";
 	}
 
 	function onClose(e) {
@@ -73,6 +73,7 @@ stendhal.ui.Popup = function(title, content, x, y) {
 	this.popupdiv.style.position = "absolute";
 	this.popupdiv.style.left = x + "px";
 	this.popupdiv.style.top = y + "px";
+	this.popupdiv.className = "popupdiv";
 	var temp = content;
 	if (title) {
 		temp = createTitleHtml() + content;
@@ -91,7 +92,7 @@ stendhal.ui.Menu = function(entity, x, y) {
 	if (stendhal.ui.globalpopup) {
 		stendhal.ui.globalpopup.popup.close();
 	}
-	
+
 	var actions = [];
 	var that = this;
 	entity.buildActions(actions);
@@ -130,7 +131,7 @@ stendhal.ui.Menu = function(entity, x, y) {
 				actions[i].action(entity);
 			} else {
 				var action = {
-					"type": actions[i].type, 
+					"type": actions[i].type,
 					"target": "#" + entity.id,
 					"zone": marauroa.currentZoneName
 				};
@@ -138,7 +139,7 @@ stendhal.ui.Menu = function(entity, x, y) {
 			}
 		}
 	});
-	
+
 	this.close = function() {
 		this.popup.close();
 		stendhal.ui.globalpopup = null;
@@ -168,6 +169,25 @@ stendhal.ui.DropNumberDialog = function(action, x, y) {
 		}
 		that.popup.close();
 	});
+
+	this.close = function() {
+		this.popup.close();
+		stendhal.ui.globalpopup = null;
+	}
+	stendhal.ui.globalpopup = this;
+}
+
+
+/**
+ * @constructor
+ */
+stendhal.ui.ImageViewer = function(title, caption, path) {
+	if (stendhal.ui.globalpopup) {
+		stendhal.ui.globalpopup.popup.close();
+	}
+
+	var content = "<h3>" + stendhal.ui.html.esc(caption) + "</h3><img src=\"" + stendhal.ui.html.esc(path) + "\">";
+	this.popup = new stendhal.ui.Popup(title, content, 100, 50);
 
 	this.close = function() {
 		this.popup.close();

@@ -41,11 +41,14 @@ import games.stendhal.server.entity.RPEntity;
 import games.stendhal.server.entity.creature.DomesticAnimal;
 import games.stendhal.server.entity.creature.Pet;
 import games.stendhal.server.entity.creature.Sheep;
+import games.stendhal.server.entity.item.BreakableItem;
 import games.stendhal.server.entity.item.Item;
 import games.stendhal.server.entity.item.StackableItem;
 import games.stendhal.server.entity.npc.SpeakerNPC;
+import games.stendhal.server.entity.npc.TrainingDummy;
 import games.stendhal.server.entity.player.Player;
 import games.stendhal.server.events.AttackEvent;
+import marauroa.common.game.RPObject;
 import marauroa.common.net.message.TransferContent;
 import marauroa.server.game.db.DAORegister;
 import marauroa.server.game.rp.RPServerManager;
@@ -271,6 +274,8 @@ public class StendhalRPAction {
 			return false;
 		}
 
+		final boolean usesTrainingDummy = defender instanceof TrainingDummy;
+
 		defender.rememberAttacker(player);
 		if (defender instanceof Player) {
 			player.storeLastPVPActionTime();
@@ -310,8 +315,17 @@ public class StendhalRPAction {
 			weaponClass = attackWeapon.getWeaponType();
 		}
 
-		// Throw dices to determine if the attacker has missed the defender
-		final boolean beaten = player.canHit(defender);
+		final boolean beaten;
+		if (usesTrainingDummy) {
+			// training dummies can always be hit
+			beaten = true;
+		} else {
+			// Throw dices to determine if the attacker has missed the defender
+			beaten = player.canHit(defender);
+		}
+
+		// For checking if RATK XP should be incremented on successful hit
+		boolean addRatkXP = isRanged;
 
 		/* TODO: Remove if alternate attack training method implemented in
 		 *       game.
@@ -324,7 +338,13 @@ public class StendhalRPAction {
 			// disabled attack xp for attacking NPC's
 			if (!(defender instanceof SpeakerNPC)
 					&& player.getsFightXpFrom(defender)) {
-				player.incAtkXP();
+				if (isRanged) {
+					player.incRatkXP();
+					// don't allow player to receive double experience from successful hits
+					addRatkXP = false;
+				} else {
+					player.incAtkXP();
+				}
 			}
 		}
 
@@ -334,10 +354,22 @@ public class StendhalRPAction {
 				defender.incDefXP();
 			}
 
+			// FIXME: some of this can be skipped when using a training dummy
 			final List<Item> weapons = player.getWeapons();
+			final float itemAtk;
+			if (isRanged) {
+				itemAtk = player.getItemRatk();
+			} else {
+				itemAtk = player.getItemAtk();
+			}
 
-			int damage = player.damageDone(defender, player.getItemAtk(), player.getDamageType());
-			if (damage > 0) {
+			int damage = player.damageDone(defender, itemAtk, player.getDamageType());
+			if (!usesTrainingDummy && damage > 0) {
+
+				if (addRatkXP && !(defender instanceof SpeakerNPC)) {
+					// Range attack XP is incremented for successful hits regardless of whether player has recently been hit
+					player.incRatkXP();
+				}
 
 				// limit damage to target HP
 				damage = Math.min(damage, defender.getHP());
@@ -375,6 +407,21 @@ public class StendhalRPAction {
 			//deteriorate weapons of attacker
 			for (Item weapon : weapons) {
 				weapon.deteriorate();
+
+				if (weapon instanceof BreakableItem) {
+					final BreakableItem breakable = (BreakableItem) weapon;
+					if (breakable.isBroken() && breakable.isContained()) {
+						final RPObject slot = breakable.getContainer();
+						if (breakable.getContainerSlot().remove(breakable.getID()) != null) {
+							if (slot instanceof Entity) {
+								((Entity) slot).notifyWorldAboutChanges();
+							}
+							player.sendPrivateText("Your " + breakable.getName() + " has broken!");
+						} else {
+							logger.error("Could not remove BreakableItem \"" + breakable.getName() + "\" with ID " + breakable.getID().toString());
+						}
+					}
+				}
 			}
 			//randomly choose one defensive item to deteriorate
 			List<Item> defenseItems = defender.getDefenseItems();
@@ -789,6 +836,14 @@ public class StendhalRPAction {
 	private static boolean isValidPlacement(final StendhalRPZone zone, final Entity entity,
 			final Shape allowedArea, final int oldX, final int oldY,
 			final int newX, final int newY, final boolean checkPath) {
+
+		// allow admins in ghostmode to teleport to collision tiles
+		if (entity instanceof Player) {
+			if (((Player) entity).isGhost()) {
+				return true;
+			}
+		}
+
 		if (!zone.collides(entity, newX, newY)) {
 			// Check the possibleArea now. This is a performance
 			// optimization because the pathfinding is very expensive.
